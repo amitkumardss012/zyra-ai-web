@@ -4,7 +4,6 @@ import "./globals.css";
 import AuthProvider from "@/providers/auth-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { PostAuthToast } from "@/components/post-auth-toast";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -55,7 +54,6 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-300">
         <AuthProvider>
           <ThemeProvider>
-            <PostAuthToast />
             {children}
             <Toaster />
           </ThemeProvider>

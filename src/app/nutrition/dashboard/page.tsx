@@ -152,7 +152,7 @@ function MacroCard({
       <div className="flex items-center justify-between mb-3">
         <div
           className={cn(
-            "flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br shadow-lg",
+            "flex items-center justify-center w-9 h-9 rounded-xl bg-linear-to-br shadow-lg",
             gradient
           )}
         >
@@ -189,7 +189,7 @@ function MacroCard({
       <div className="mt-3 h-1.5 rounded-full bg-muted/50 overflow-hidden">
         <div
           className={cn(
-            "h-full rounded-full bg-gradient-to-r transition-all duration-1000 ease-out",
+            "h-full rounded-full bg-linear-to-r transition-all duration-1000 ease-out",
             gradient
           )}
           style={{ width: `${Math.min(pct, 100)}%` }}
@@ -325,7 +325,7 @@ export default function DashboardPage() {
                     <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
                       <div
                         className={cn(
-                          "h-full rounded-full bg-gradient-to-r",
+                          "h-full rounded-full bg-linear-to-r",
                           n.color
                         )}
                         style={{ width: `${Math.min(pct, 100)}%` }}
@@ -388,10 +388,10 @@ export default function DashboardPage() {
                         className={cn(
                           "absolute bottom-0 left-0 right-0 rounded-lg transition-all duration-700",
                           isToday
-                            ? "bg-gradient-to-t from-primary to-primary/60"
+                            ? "bg-linear-to-t from-primary to-primary/60"
                             : d.calories > d.goal
-                            ? "bg-gradient-to-t from-secondary to-secondary/60"
-                            : "bg-gradient-to-t from-primary/60 to-primary/30"
+                            ? "bg-linear-to-t from-secondary to-secondary/60"
+                            : "bg-linear-to-t from-primary/60 to-primary/30"
                         )}
                         style={{ height: `${(d.calories / d.goal) * 100}%` }}
                       />
