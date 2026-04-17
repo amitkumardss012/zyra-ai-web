@@ -123,7 +123,7 @@ export default function BeautyChatPage() {
   };
 
   return (
-    <div className="flex flex-col h-full max-h-[calc(100vh-0px)] md:max-h-screen">
+    <div className="flex flex-col h-full">
       {/* Header */}
       <div className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-border/50 bg-card/50 backdrop-blur-xl">
         <div className="flex items-center gap-3">
@@ -257,11 +257,11 @@ export default function BeautyChatPage() {
         )}
       </div>
 
-      {/* Input */}
-      <div className="px-4 md:px-8 py-4 border-t border-border/50 bg-card/50 backdrop-blur-xl">
+      {/* Input area */}
+      <div className="flex-shrink-0 px-4 md:px-8 py-4 border-t border-border/50 bg-card/50 backdrop-blur-xl">
         <div className="max-w-[720px] mx-auto">
           <div className="flex items-end gap-2 p-2 rounded-2xl border border-border/50 bg-background focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/10 transition-all duration-200">
-            <div className="flex items-center px-1.5">
+            <div className="flex items-center justify-center w-8 h-8 rounded-xl shrink-0">
               <Lightbulb className="w-4 h-4 text-muted-foreground/40" />
             </div>
             <textarea
@@ -271,7 +271,7 @@ export default function BeautyChatPage() {
               onKeyDown={handleKeyDown}
               placeholder="Ask about skincare, makeup routines..."
               rows={1}
-              className="flex-1 resize-none bg-transparent text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none min-h-[36px] max-h-[120px] py-1.5"
+              className="flex-1 min-w-0 resize-none bg-transparent text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none min-h-[36px] max-h-[120px] py-1.5"
               style={{ height: "auto" }}
               onInput={(e) => {
                 const target = e.target as HTMLTextAreaElement;
@@ -283,7 +283,7 @@ export default function BeautyChatPage() {
               onClick={() => handleSend()}
               disabled={!input.trim() || isTyping}
               className={cn(
-                "flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200 shrink-0",
+                "flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200 shrink-0 mb-0.5",
                 input.trim() && !isTyping
                   ? "bg-primary text-primary-foreground shadow-md shadow-primary/25 hover:shadow-primary/40 active:scale-95"
                   : "bg-muted text-muted-foreground/40",
