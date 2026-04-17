@@ -1,20 +1,19 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import {
-  Send,
-  Sparkles,
-  User,
   Bot,
-  Loader2,
-  Lightbulb,
   Droplet,
   Flower2,
-  Sparkle,
-  Target,
+  Lightbulb,
   RotateCcw,
+  Send,
+  Sparkle,
+  Sparkles,
+  Target,
+  User
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useEffect, useRef, useState } from "react";
 
 /* ─── Types ─── */
 interface Message {
@@ -96,16 +95,19 @@ export default function BeautyChatPage() {
     setIsTyping(true);
 
     // Simulate AI response
-    setTimeout(() => {
-      const assistantMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: MOCK_RESPONSES.default,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, assistantMsg]);
-      setIsTyping(false);
-    }, 1500 + Math.random() * 1000);
+    setTimeout(
+      () => {
+        const assistantMsg: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: MOCK_RESPONSES.default,
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, assistantMsg]);
+        setIsTyping(false);
+      },
+      1500 + Math.random() * 1000,
+    );
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -125,7 +127,7 @@ export default function BeautyChatPage() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-border/50 bg-card/50 backdrop-blur-xl">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
+          <div className="w-9 h-9 rounded-xl bg-linear-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
             <Sparkles className="w-4 h-4 text-primary-foreground" />
           </div>
           <div>
@@ -154,7 +156,7 @@ export default function BeautyChatPage() {
           /* Empty state */
           <div className="flex flex-col items-center justify-center h-full max-w-[480px] mx-auto">
             <div className="relative mb-6">
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+              <div className="w-20 h-20 rounded-3xl bg-linear-to-br from-primary/10 to-primary/5 flex items-center justify-center">
                 <Bot className="w-9 h-9 text-primary/50" />
               </div>
               <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
@@ -165,7 +167,8 @@ export default function BeautyChatPage() {
               Ask me anything about beauty & skin
             </h2>
             <p className="text-xs text-muted-foreground text-center mt-1.5 max-w-[320px]">
-              I can help with tailored routines, analyzing cosmetic ingredients, and improving your skin health
+              I can help with tailored routines, analyzing cosmetic ingredients,
+              and improving your skin health
             </p>
             {/* Quick prompts */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-6 w-full">
@@ -173,7 +176,7 @@ export default function BeautyChatPage() {
                 <button
                   key={prompt.label}
                   onClick={() => handleSend(prompt.prompt)}
-                  className="group flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-card hover:border-primary/30 hover:bg-primary/[0.02] transition-all duration-200 text-left"
+                  className="group flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-card hover:border-primary/30 hover:bg-primary/2 transition-all duration-200 text-left"
                 >
                   <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
                     <prompt.icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -197,11 +200,11 @@ export default function BeautyChatPage() {
                 key={msg.id}
                 className={cn(
                   "flex gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300",
-                  msg.role === "user" ? "justify-end" : "justify-start"
+                  msg.role === "user" ? "justify-end" : "justify-start",
                 )}
               >
                 {msg.role === "assistant" && (
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shrink-0 mt-0.5 shadow-md shadow-primary/20">
+                  <div className="w-7 h-7 rounded-lg bg-linear-to-br from-primary to-primary/60 flex items-center justify-center shrink-0 mt-0.5 shadow-md shadow-primary/20">
                     <Bot className="w-3.5 h-3.5 text-primary-foreground" />
                   </div>
                 )}
@@ -210,7 +213,7 @@ export default function BeautyChatPage() {
                     "max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
                     msg.role === "user"
                       ? "bg-primary text-primary-foreground rounded-tr-sm"
-                      : "bg-card border border-border/50 text-foreground rounded-tl-sm"
+                      : "bg-card border border-border/50 text-foreground rounded-tl-sm",
                   )}
                 >
                   <div className="whitespace-pre-wrap">{msg.content}</div>
@@ -219,7 +222,7 @@ export default function BeautyChatPage() {
                       "text-[9px] mt-2 font-medium",
                       msg.role === "user"
                         ? "text-primary-foreground/50"
-                        : "text-muted-foreground/50"
+                        : "text-muted-foreground/50",
                     )}
                   >
                     {msg.timestamp.toLocaleTimeString([], {
@@ -238,7 +241,7 @@ export default function BeautyChatPage() {
             {/* Typing indicator */}
             {isTyping && (
               <div className="flex gap-3 animate-in fade-in duration-200">
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shrink-0 shadow-md shadow-primary/20">
+                <div className="w-7 h-7 rounded-lg bg-linear-to-br from-primary to-primary/60 flex items-center justify-center shrink-0 shadow-md shadow-primary/20">
                   <Bot className="w-3.5 h-3.5 text-primary-foreground" />
                 </div>
                 <div className="bg-card border border-border/50 rounded-2xl rounded-tl-sm px-4 py-3">
@@ -283,14 +286,15 @@ export default function BeautyChatPage() {
                 "flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200 shrink-0",
                 input.trim() && !isTyping
                   ? "bg-primary text-primary-foreground shadow-md shadow-primary/25 hover:shadow-primary/40 active:scale-95"
-                  : "bg-muted text-muted-foreground/40"
+                  : "bg-muted text-muted-foreground/40",
               )}
             >
               <Send className="w-3.5 h-3.5" />
             </button>
           </div>
           <p className="text-[10px] text-muted-foreground/40 text-center mt-2 font-medium">
-            AuraScan AI may make mistakes. Verify important medical conditions with a dermatologist.
+            AuraScan AI may make mistakes. Verify important medical conditions
+            with a dermatologist.
           </p>
         </div>
       </div>
