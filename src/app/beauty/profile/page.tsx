@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import {
   Award,
   Bell,
@@ -10,6 +11,7 @@ import {
   Droplet,
   Edit3,
   Flower2,
+  Flame,
   Heart,
   HelpCircle,
   LogOut,
@@ -373,6 +375,32 @@ export default function BeautyProfilePage() {
             </div>
             <p className="text-xs font-semibold text-destructive">Sign Out</p>
           </button>
+        </div>
+      </div>
+ 
+      {/* ─── Mode Switcher ─── */}
+      <div className="rounded-2xl border border-primary/20 bg-linear-to-br from-primary/5 via-transparent to-transparent p-6 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 group-hover:opacity-20 transition-all duration-500">
+           <Flame className="w-24 h-24 text-primary" />
+        </div>
+        
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+              <Flame className="w-5 h-5 text-primary" />
+              Switch to Nutrition Mode
+            </h3>
+            <p className="text-xs text-muted-foreground leading-relaxed max-w-[400px]">
+              Track your daily nutrition, scan food items for instant macro analysis, and get AI-powered meal plans for your transformation.
+            </p>
+          </div>
+          <Link
+            href="/nutrition/dashboard"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
+          >
+            Switch Now
+            <ChevronRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
     </div>
