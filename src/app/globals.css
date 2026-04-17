@@ -46,6 +46,28 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* AI Loader Animations Definitions */
+  --animate-orbit-slow: orbit 6s linear infinite;
+  --animate-orbit-fast: orbit 4s linear infinite;
+  --animate-scanning: scan 2s ease-in-out infinite;
+
+  @keyframes progress {
+    0% { transform: scaleX(0); }
+    100% { transform: scaleX(1); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes orbit {
+    from { transform: rotate(0deg) translateX(40px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(40px) rotate(-360deg); }
+  }
+  @keyframes scan {
+    0%, 100% { transform: translateY(-50%); opacity: 0; }
+    50% { transform: translateY(150%); opacity: 1; }
+  }
 }
 
 :root {

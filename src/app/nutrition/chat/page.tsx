@@ -155,7 +155,7 @@ export default function ChatPage() {
           /* Empty state */
           <div className="flex flex-col items-center justify-center h-full max-w-[480px] mx-auto">
             <div className="relative mb-6">
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+              <div className="w-20 h-20 rounded-3xl bg-linear-to-br from-primary/10 to-primary/5 flex items-center justify-center">
                 <Bot className="w-9 h-9 text-primary/50" />
               </div>
               <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
@@ -175,7 +175,7 @@ export default function ChatPage() {
                 <button
                   key={prompt.label}
                   onClick={() => handleSend(prompt.prompt)}
-                  className="group flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-card hover:border-primary/30 hover:bg-primary/[0.02] transition-all duration-200 text-left"
+                  className="group flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-card hover:border-primary/30 hover:bg-primary/2 transition-all duration-200 text-left"
                 >
                   <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
                     <prompt.icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -203,7 +203,7 @@ export default function ChatPage() {
                 )}
               >
                 {msg.role === "assistant" && (
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shrink-0 mt-0.5 shadow-md shadow-primary/20">
+                  <div className="w-7 h-7 rounded-lg bg-linear-to-br from-primary to-primary/60 flex items-center justify-center shrink-0 mt-0.5 shadow-md shadow-primary/20">
                     <Bot className="w-3.5 h-3.5 text-primary-foreground" />
                   </div>
                 )}
@@ -240,7 +240,7 @@ export default function ChatPage() {
             {/* Typing indicator */}
             {isTyping && (
               <div className="flex gap-3 animate-in fade-in duration-200">
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shrink-0 shadow-md shadow-primary/20">
+                <div className="w-7 h-7 rounded-lg bg-linear-to-br from-primary to-primary/60 flex items-center justify-center shrink-0 shadow-md shadow-primary/20">
                   <Bot className="w-3.5 h-3.5 text-primary-foreground" />
                 </div>
                 <div className="bg-card border border-border/50 rounded-2xl rounded-tl-sm px-4 py-3">
@@ -257,7 +257,7 @@ export default function ChatPage() {
       </div>
 
       {/* Input area */}
-      <div className="flex-shrink-0 px-4 md:px-8 py-4 border-t border-border/50 bg-card/50 backdrop-blur-xl">
+      <div className="shrink-0 px-4 md:px-8 py-4 border-t border-border/50 bg-card/50 backdrop-blur-xl">
         <div className="max-w-[720px] mx-auto">
           <div className="flex items-end gap-2 p-2 rounded-2xl border border-border/50 bg-background focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/10 transition-all duration-200">
             <div className="flex items-center justify-center w-8 h-8 rounded-xl shrink-0">

@@ -258,7 +258,7 @@ export default function BeautyChatPage() {
       </div>
 
       {/* Input area */}
-      <div className="flex-shrink-0 px-4 md:px-8 py-4 border-t border-border/50 bg-card/50 backdrop-blur-xl">
+      <div className="shrink-0 px-4 md:px-8 py-4 border-t border-border/50 bg-card/50 backdrop-blur-xl">
         <div className="max-w-[720px] mx-auto">
           <div className="flex items-end gap-2 p-2 rounded-2xl border border-border/50 bg-background focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/10 transition-all duration-200">
             <div className="flex items-center justify-center w-8 h-8 rounded-xl shrink-0">

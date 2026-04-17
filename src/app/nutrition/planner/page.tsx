@@ -19,6 +19,7 @@ import {
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AILoader } from "@/components/ui/ai-loader";
 
 /* ─── Types ─── */
 type GoalType = "lose" | "gain" | "maintain" | "recomp";
@@ -137,11 +138,11 @@ export default function PlannerPage() {
 
   const handleGenerate = () => {
     setGenerating(true);
+    setStep(3);
     setTimeout(() => {
       setPlan(MOCK_PLAN);
       setGenerating(false);
-      setStep(3);
-    }, 3000);
+    }, 4000);
   };
 
   const handleNext = () => {
@@ -166,7 +167,7 @@ export default function PlannerPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
+          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
             <CalendarHeart className="w-5 h-5 text-primary-foreground" />
           </div>
           Transformation Planner
@@ -247,7 +248,7 @@ export default function PlannerPage() {
                 )}
                 <div
                   className={cn(
-                    "w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-lg",
+                    "w-12 h-12 rounded-xl flex items-center justify-center bg-linear-to-br shadow-lg",
                     goal.gradient
                   )}
                 >
@@ -350,29 +351,13 @@ export default function PlannerPage() {
 
       {/* ─── Step 3 (Generating / Result) ─── */}
       {step === 3 && generating && (
-        <div className="flex flex-col items-center justify-center py-20 animate-in fade-in duration-300">
-          <div className="relative">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            </div>
-            <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
-              <Sparkles className="w-3.5 h-3.5 text-primary-foreground" />
-            </div>
-          </div>
-          <p className="text-sm font-semibold text-foreground mt-5">
-            Crafting your personalized plan...
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            AI is analyzing your goals and creating the optimal nutrition
-            strategy
-          </p>
-        </div>
+        <AILoader type="nutrition" />
       )}
 
       {step === 3 && plan && !generating && (
         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
           {/* Plan Overview */}
-          <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-transparent p-5">
+          <div className="rounded-2xl border border-primary/20 bg-linear-to-br from-primary/5 to-transparent p-5">
             <div className="flex items-center gap-2 mb-3">
               <Sparkles className="w-4 h-4 text-primary" />
               <h2 className="text-sm font-bold text-primary">

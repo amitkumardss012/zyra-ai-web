@@ -17,6 +17,7 @@ import {
   Wand2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AILoader } from "@/components/ui/ai-loader";
 
 /* ─── Types ─── */
 type GoalType = "clear" | "anti-aging" | "glow" | "repair";
@@ -115,11 +116,11 @@ export default function BeautyPlannerPage() {
 
   const handleGenerate = () => {
     setGenerating(true);
+    setStep(3);
     setTimeout(() => {
       setPlan(MOCK_PLAN);
       setGenerating(false);
-      setStep(3);
-    }, 3000);
+    }, 4000);
   };
 
   const handleNext = () => {
@@ -301,22 +302,7 @@ export default function BeautyPlannerPage() {
 
       {/* ─── Step 3 (Generating / Result) ─── */}
       {step === 3 && generating && (
-        <div className="flex flex-col items-center justify-center py-20 animate-in fade-in duration-300">
-          <div className="relative">
-            <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            </div>
-            <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
-              <Wand2 className="w-3.5 h-3.5 text-primary-foreground" />
-            </div>
-          </div>
-          <p className="text-sm font-semibold text-foreground mt-5">
-            Crafting your personalized routine...
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            AI is analyzing your skin profile and creating the perfect regimen
-          </p>
-        </div>
+        <AILoader type="beauty" />
       )}
 
       {step === 3 && plan && !generating && (
