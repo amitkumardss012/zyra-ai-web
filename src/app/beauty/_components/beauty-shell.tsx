@@ -14,9 +14,13 @@ import {
   Droplets,
   Wand2,
   Flower2,
-  MessageCircleHeart
+  MessageCircleHeart,
+  LogOut,
+  RefreshCcw,
+  Flame
 } from "lucide-react";
 import { useState } from "react";
+import { signOut } from "next-auth/react";
 
 const NAV_ITEMS = [
   {
@@ -143,6 +147,71 @@ export function BeautyShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
+
+        {/* Secondary Actions */}
+        <div className="px-3 py-4 flex flex-col gap-1 border-t border-border/50">
+           {!collapsed && (
+            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 px-2 mb-2">
+              System
+            </span>
+          )}
+          
+          {/* Mode Switcher */}
+          <Link
+            href="/nutrition/dashboard"
+            className={cn(
+               "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 relative",
+               collapsed && "justify-center px-0",
+               "text-muted-foreground hover:text-orange-500 hover:bg-orange-500/10"
+            )}
+          >
+            <Flame className={cn(
+              "shrink-0 transition-colors duration-200",
+              collapsed ? "w-5 h-5" : "w-[18px] h-[18px]"
+            )} />
+            {!collapsed && (
+               <div className="flex flex-col animate-in fade-in duration-200">
+                <span>Switch to Nutrition</span>
+                <span className="text-[10px] text-muted-foreground/60 font-normal">
+                  Toggle AI modules
+                </span>
+              </div>
+            )}
+            {collapsed && (
+              <div className="absolute left-full ml-2 px-2.5 py-1 rounded-md bg-popover border border-border text-xs font-medium text-popover-foreground shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
+                Switch to Nutrition
+              </div>
+            )}
+          </Link>
+
+          {/* Logout */}
+          <button
+            onClick={() => signOut({ callbackUrl: "/auth" })}
+            className={cn(
+              "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 relative w-full text-left",
+              collapsed && "justify-center px-0",
+              "text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+            )}
+          >
+            <LogOut className={cn(
+              "shrink-0 transition-colors duration-200",
+              collapsed ? "w-5 h-5" : "w-[18px] h-[18px]"
+            )} />
+            {!collapsed && (
+              <div className="flex flex-col animate-in fade-in duration-200">
+                <span>Sign Out</span>
+                <span className="text-[10px] text-muted-foreground/60 font-normal">
+                  Exit your session
+                </span>
+              </div>
+            )}
+             {collapsed && (
+              <div className="absolute left-full ml-2 px-2.5 py-1 rounded-md bg-popover border border-border text-xs font-medium text-popover-foreground shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
+                Sign Out
+              </div>
+            )}
+          </button>
+        </div>
 
         {/* Collapse toggle */}
         <div className="px-3 py-3 border-t border-border/50">
