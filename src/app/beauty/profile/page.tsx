@@ -7,16 +7,16 @@ import {
   Calendar,
   Camera,
   ChevronRight,
-  Dumbbell,
+  Droplet,
   Edit3,
-  Flame,
+  Flower2,
   Heart,
   HelpCircle,
   LogOut,
   Moon,
-  Scale,
   Settings,
   Shield,
+  Sparkle,
   Sun,
   Target,
   TrendingUp
@@ -25,45 +25,45 @@ import { useState } from "react";
 
 /* ─── Mock User Data ─── */
 const USER = {
-  name: "John Doe",
-  email: "john@example.com",
+  name: "Emily Rose",
+  email: "emily@example.com",
   avatar: null,
-  joinDate: "March 2024",
+  joinDate: "January 2024",
   plan: "Pro",
 };
 
 const STATS = [
-  { label: "Meals Logged", value: "342", icon: Flame, color: "text-primary" },
-  { label: "Day Streak", value: "14", icon: Target, color: "text-secondary" },
-  { label: "Avg Protein", value: "145g", icon: TrendingUp, color: "text-accent" },
-  { label: "Achievement", value: "12", icon: Award, color: "text-violet-500" },
+  { label: "Products Scanned", value: "84", icon: Sparkle, color: "text-primary" },
+  { label: "Day Streak", value: "22", icon: Target, color: "text-secondary" },
+  { label: "Skin Health", value: "92%", icon: TrendingUp, color: "text-emerald-500" },
+  { label: "Badges", value: "5", icon: Award, color: "text-violet-500" },
 ];
 
 const PROGRESS_DATA = [
-  { week: "W1", weight: 82 },
-  { week: "W2", weight: 81.2 },
-  { week: "W3", weight: 80.5 },
-  { week: "W4", weight: 80.1 },
-  { week: "W5", weight: 79.3 },
-  { week: "W6", weight: 78.8 },
-  { week: "W7", weight: 78.2 },
-  { week: "W8", weight: 77.5 },
+  { week: "W1", score: 65 },
+  { week: "W2", score: 70 },
+  { week: "W3", score: 72 },
+  { week: "W4", score: 78 },
+  { week: "W5", score: 82 },
+  { week: "W6", score: 85 },
+  { week: "W7", score: 88 },
+  { week: "W8", score: 92 },
 ];
 
 const ACHIEVEMENTS = [
-  { label: "7-Day Streak", earned: true, icon: "🔥" },
-  { label: "100 Meals", earned: true, icon: "🍽️" },
-  { label: "Protein King", earned: true, icon: "💪" },
+  { label: "7-Day Streak", earned: true, icon: "✨" },
+  { label: "Clean Beauty", earned: true, icon: "🌿" },
+  { label: "Purity Master", earned: true, icon: "💧" },
   { label: "30-Day Streak", earned: false, icon: "⭐" },
-  { label: "500 Meals", earned: false, icon: "🏆" },
+  { label: "100 Scans", earned: false, icon: "📸" },
   { label: "1 Year", earned: false, icon: "👑" },
 ];
 
-export default function ProfilePage() {
+export default function BeautyProfilePage() {
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
-  const minWeight = Math.min(...PROGRESS_DATA.map((d) => d.weight)) - 1;
-  const maxWeight = Math.max(...PROGRESS_DATA.map((d) => d.weight)) + 1;
+  const minScore = 50;
+  const maxScore = 100;
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-8 max-w-[900px] mx-auto space-y-6">
@@ -95,7 +95,7 @@ export default function ProfilePage() {
                 </span>
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {USER.email}
+               {USER.email}
               </p>
               <p className="text-[10px] text-muted-foreground/60 mt-0.5 flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
@@ -133,11 +133,11 @@ export default function ProfilePage() {
       <div className="rounded-2xl border border-border/50 bg-card p-5">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-            <Scale className="w-4 h-4 text-primary" />
-            Weight Progress
+            <Sparkle className="w-4 h-4 text-primary" />
+            Skin Health Progress
           </h3>
           <span className="text-xs text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-full">
-            -{(PROGRESS_DATA[0].weight - PROGRESS_DATA[PROGRESS_DATA.length - 1].weight).toFixed(1)} kg
+            +{(PROGRESS_DATA[PROGRESS_DATA.length - 1].score - PROGRESS_DATA[0].score)}%
           </span>
         </div>
         {/* Simple line chart */}
@@ -161,7 +161,7 @@ export default function ProfilePage() {
               d={`M${PROGRESS_DATA.map(
                 (d, i) =>
                   `${(i / (PROGRESS_DATA.length - 1)) * 400},${
-                    120 - ((d.weight - minWeight) / (maxWeight - minWeight)) * 120
+                    120 - ((d.score - minScore) / (maxScore - minScore)) * 120
                   }`
               ).join(" L")} L400,120 L0,120 Z`}
               fill="url(#progressGradient)"
@@ -172,7 +172,7 @@ export default function ProfilePage() {
               points={PROGRESS_DATA.map(
                 (d, i) =>
                   `${(i / (PROGRESS_DATA.length - 1)) * 400},${
-                    120 - ((d.weight - minWeight) / (maxWeight - minWeight)) * 120
+                    120 - ((d.score - minScore) / (maxScore - minScore)) * 120
                   }`
               ).join(" ")}
               fill="none"
@@ -186,7 +186,7 @@ export default function ProfilePage() {
               <circle
                 key={i}
                 cx={(i / (PROGRESS_DATA.length - 1)) * 400}
-                cy={120 - ((d.weight - minWeight) / (maxWeight - minWeight)) * 120}
+                cy={120 - ((d.score - minScore) / (maxScore - minScore)) * 120}
                 r={3}
                 fill="var(--primary)"
                 stroke="var(--card)"
@@ -270,7 +270,7 @@ export default function ProfilePage() {
                   Notifications
                 </p>
                 <p className="text-[10px] text-muted-foreground">
-                  Meal reminders & daily reports
+                  Routine reminders & tips
                 </p>
               </div>
             </div>
@@ -326,14 +326,14 @@ export default function ProfilePage() {
           {/* Menu items */}
           {[
             {
-              icon: Heart,
-              label: "Health Goals",
-              desc: "Update your fitness targets",
+              icon: Flower2,
+              label: "Skin Profile",
+              desc: "Update your skin type & concerns",
             },
             {
-              icon: Dumbbell,
-              label: "Workout Integration",
-              desc: "Connect with fitness apps",
+              icon: Target,
+              label: "Product Preferences",
+              desc: "Ingredients to avoid",
             },
             {
               icon: Shield,
