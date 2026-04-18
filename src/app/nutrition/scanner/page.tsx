@@ -118,7 +118,7 @@ export default function ScannerPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 shadow-lg shadow-primary/20">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-linear-to-br from-primary to-primary/60 shadow-lg shadow-primary/20">
             <ScanLine className="w-5 h-5 text-primary-foreground" />
           </div>
           Food Scanner
@@ -145,7 +145,7 @@ export default function ScannerPage() {
                 "relative group cursor-pointer rounded-2xl border-2 border-dashed p-8 flex flex-col items-center justify-center min-h-[360px] transition-all duration-300",
                 dragOver
                   ? "border-primary bg-primary/5 scale-[1.02]"
-                  : "border-border/60 bg-card hover:border-primary/40 hover:bg-primary/[0.02]"
+                  : "border-border/60 bg-card hover:border-primary/40 hover:bg-primary/2"
               )}
             >
               <input
@@ -160,7 +160,7 @@ export default function ScannerPage() {
               />
               <div className="flex flex-col items-center gap-4">
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-primary/10 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                     <ImagePlus className="w-8 h-8 text-primary/60 group-hover:text-primary transition-colors duration-300" />
                   </div>
                   <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
@@ -196,7 +196,7 @@ export default function ScannerPage() {
           ) : (
             <div className="relative rounded-2xl overflow-hidden border border-border/50 bg-card">
               {/* Image preview */}
-              <div className="relative aspect-[4/3] bg-muted/20">
+              <div className="relative aspect-4/3 bg-muted/20">
                 <img
                   src={preview}
                   alt="Food preview"
@@ -361,7 +361,7 @@ export default function ScannerPage() {
                     >
                       <div
                         className={cn(
-                          "w-9 h-9 rounded-lg flex items-center justify-center bg-gradient-to-br shadow-md",
+                          "w-9 h-9 rounded-lg flex items-center justify-center bg-linear-to-br shadow-md",
                           macro.gradient
                         )}
                       >
@@ -442,7 +442,7 @@ export default function ScannerPage() {
                           <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
                             <div
                               className={cn(
-                                "h-full rounded-full bg-gradient-to-r",
+                                "h-full rounded-full bg-linear-to-r",
                                 n.color
                               )}
                               style={{
