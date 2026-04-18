@@ -1,17 +1,23 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { useAuth } from "./src/hooks/useAuth";
+import { redirect } from "next/navigation";
 
-export async function proxy(request: NextRequest) {
+async function proxy(request: NextRequest) {
   const session = await useAuth();
 
   if (!session) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    redirect("/auth");
   }
-  return NextResponse.redirect(new URL("/", request.url));
+  redirect("/");
 }
+
+export default proxy;
+
+// export const config = {
+//   matcher: ["/auth", "/nutrition/dashboard"],
+// };
 
 
 export const config = {
-  matcher: ["/auth", "/nutrition/*"],
+    matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
