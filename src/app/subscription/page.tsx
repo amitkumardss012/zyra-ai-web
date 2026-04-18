@@ -1,19 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
-import { 
-  Check, 
-  Zap, 
-  Crown, 
-  Star, 
-  ShieldCheck, 
-  Sparkles, 
-  ArrowRight,
-  TrendingUp,
-  Flame,
-  ScanLine
-} from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+    ArrowRight,
+    Check,
+    Crown,
+    Flame,
+    ScanLine,
+    ShieldCheck,
+    Sparkles,
+    Star,
+    TrendingUp,
+    Zap
+} from "lucide-react";
+import { useState } from "react";
 
 const PLANS = [
   {
