@@ -374,7 +374,7 @@ export default function DashboardPage() {
                 <TrendingUp className="w-4 h-4 text-primary" />
                 Performance Analytics
               </h3>
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-[0.1em]">Weekly Calorie Intake vs Goal</p>
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Weekly Calorie Intake vs Goal</p>
             </div>
             <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground">
               <div className="flex items-center gap-1.5">

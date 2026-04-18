@@ -366,7 +366,7 @@ export default function BeautyDashboardPage() {
                 <TrendingUp className="w-4 h-4 text-primary" />
                 Skin Health Score
               </h3>
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-[0.1em]">Weekly performance tracking</p>
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Weekly performance tracking</p>
             </div>
             <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground">
               <div className="flex items-center gap-1.5">
