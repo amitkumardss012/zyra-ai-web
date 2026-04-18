@@ -1,4 +1,4 @@
-
+"use client"
 
 import {
   Sparkle,
@@ -14,9 +14,24 @@ import {
   Plus,
   ArrowUpRight,
   AlertCircle,
-  Leaf
+  Leaf,
+  Check
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+  ReferenceLine,
+  AreaChart,
+  Area,
+} from "recharts";
+import { useEffect, useState } from "react";
 
 /* ─── Mock Data ─── */
 const DAILY_ROUTINE = {
@@ -197,6 +212,9 @@ function StatCard({
 }
 
 export default function BeautyDashboardPage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const maxBar = 100;
 
   return (
@@ -341,68 +359,104 @@ export default function BeautyDashboardPage() {
       {/* ─── Weekly Chart + Recent Scans ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Weekly Chart */}
-        <div className="lg:col-span-7 rounded-2xl border border-border/50 bg-card p-5">
-          <div className="flex items-center justify-between mb-5">
-            <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-primary" />
-              Skin Health Score
-            </h3>
-            <div className="flex items-center gap-3 text-[10px] font-semibold text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-primary" />
+        <div className="lg:col-span-7 min-w-0 rounded-3xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 overflow-hidden relative group transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 hover:border-primary/20">
+          <div className="flex items-center justify-between mb-8">
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-primary" />
+                Skin Health Score
+              </h3>
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-[0.1em]">Weekly performance tracking</p>
+            </div>
+            <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-primary shadow-lg shadow-primary/20" />
                 Score
-              </span>
-              <span className="flex items-center gap-1">
+              </div>
+              <div className="flex items-center gap-1.5 opacity-50">
                 <div className="w-2 h-2 rounded-full bg-border" />
                 Target
-              </span>
+              </div>
             </div>
           </div>
-          {/* Bar chart */}
-          <div className="flex items-end gap-2 h-40">
-            {WEEKLY_DATA.map((d) => {
-              const height = (d.score / maxBar) * 100;
-              const goalH = (d.target / maxBar) * 100;
-              const isToday = d.day === "Sun";
-              return (
-                <div
-                  key={d.day}
-                  className="flex-1 flex flex-col items-center gap-1"
-                >
-                  <span className="text-[10px] font-bold text-muted-foreground mb-1">
-                    {d.score}
-                  </span>
-                  <div className="relative w-full flex justify-center">
-                    <div
-                      className="w-full max-w-[32px] rounded-lg bg-muted/40 relative overflow-hidden"
-                      style={{ height: `100%` }}
-                    >
-                      <div
-                        className={cn(
-                          "absolute bottom-0 left-0 right-0 rounded-lg transition-all duration-700",
-                          isToday
-                            ? "bg-linear-to-t from-primary to-primary/60"
-                            : d.score >= d.target
-                            ? "bg-linear-to-t from-emerald-500 to-emerald-400/60"
-                            : "bg-linear-to-t from-primary/50 to-primary/30"
-                        )}
-                        style={{ height: `${height}%` }}
-                      />
-                      {/* Target line indicator */}
-                      <div className="absolute w-full h-[2px] bg-border border-b border-background z-10" style={{bottom: `${goalH}%`}} />
-                    </div>
-                  </div>
-                  <span
-                    className={cn(
-                      "text-[10px] font-bold mt-1",
-                      isToday ? "text-primary" : "text-muted-foreground"
-                    )}
-                  >
-                    {d.day}
-                  </span>
-                </div>
-              );
-            })}
+          
+          <div className="h-52 w-full mt-4 min-h-[200px]">
+            {mounted ? (
+              <ResponsiveContainer width="100%" height={200}>
+                <AreaChart data={WEEKLY_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid 
+                    strokeDasharray="8 8" 
+                    vertical={false} 
+                    stroke="var(--border)" 
+                    strokeOpacity={0.2}
+                  />
+                  <XAxis 
+                    dataKey="day" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: 800 }}
+                    dy={15}
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: 800 }}
+                  />
+                  <Tooltip 
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-card/80 backdrop-blur-xl border border-border/50 p-4 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-2">{payload[0].payload.day}</p>
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-2xl font-black text-foreground tracking-tighter">
+                                {payload[0].value}
+                              </span>
+                              <span className="text-[10px] font-bold text-muted-foreground uppercase">Points</span>
+                            </div>
+                            <div className="mt-3 flex items-center gap-2 text-[10px] font-bold py-1 px-2 rounded-lg bg-primary/10 text-primary w-fit">
+                              <Check className="w-3 h-3" />
+                              Target: {payload[0].payload.target}
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="score" 
+                    stroke="var(--primary)" 
+                    strokeWidth={4}
+                    fillOpacity={1} 
+                    fill="url(#colorScore)" 
+                    animationDuration={2000}
+                    dot={{ 
+                      r: 4, 
+                      fill: "var(--background)", 
+                      stroke: "var(--primary)", 
+                      strokeWidth: 2,
+                      strokeOpacity: 1
+                    }}
+                    activeDot={{ 
+                      r: 6, 
+                      fill: "var(--primary)", 
+                      stroke: "var(--background)", 
+                      strokeWidth: 2,
+                    }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="w-full h-full bg-muted/10 animate-pulse rounded-2xl" />
+            )}
           </div>
         </div>
 
