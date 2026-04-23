@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { useAuth } from "./src/hooks/useAuth";
 import { redirect } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 async function proxy(request: NextRequest) {
   const session = await useAuth();

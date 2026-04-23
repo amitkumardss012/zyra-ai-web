@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
 import { Lock } from "lucide-react";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { signIn } from "../../../auth";
+import { useAuth } from "@/hooks/useAuth";
 
 export const metadata: Metadata = {
   title: "Sign In | Symbosys",
@@ -38,7 +38,7 @@ export default async function AuthPage() {
           <form
             action={async () => {
               "use server";
-              await signIn("google", { redirectTo: "/" });
+              await signIn("google", { redirectTo: "/callback" });
             }}
           >
             <Button

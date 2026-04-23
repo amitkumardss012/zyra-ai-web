@@ -4,6 +4,7 @@ import "./globals.css";
 import AuthProvider from "@/providers/auth-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import SessionProviderWrapper from "@/providers/session-provider";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -54,8 +55,10 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-300">
         <AuthProvider>
           <ThemeProvider>
-            {children}
-            <Toaster />
+            <SessionProviderWrapper>
+              {children}
+              <Toaster />
+            </SessionProviderWrapper>
           </ThemeProvider>
         </AuthProvider>
       </body>
