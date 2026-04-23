@@ -279,7 +279,7 @@ export default function CompleteOnboardingPage() {
                       {formData.preferredMode === mode.id && (
                         <div className="absolute top-4 right-4">
                           <div className="w-5 h-5 rounded-full bg-foreground flex items-center justify-center">
-                            <Check className="w-3 h-3 text-background stroke-[3]" />
+                            <Check className="w-3 h-3 text-background stroke-3" />
                           </div>
                         </div>
                       )}
