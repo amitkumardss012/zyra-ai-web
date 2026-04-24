@@ -1,71 +1,71 @@
-"use client";
-
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import {
   Award,
-  Bell,
   Calendar,
   Camera,
   ChevronRight,
-  Droplet,
+  Dumbbell,
   Edit3,
-  Flower2,
   Flame,
   Heart,
   HelpCircle,
-  LogOut,
-  Moon,
+  Scale,
   Settings,
   Shield,
-  Sparkle,
-  Sun,
+  Sparkles,
   Target,
   TrendingUp
 } from "lucide-react";
-import { useState } from "react";
-
-/* ─── Mock User Data ─── */
-const USER = {
-  name: "Emily Rose",
-  email: "emily@example.com",
-  avatar: null,
-  joinDate: "January 2024",
-  plan: "Pro",
-};
+import { getCurrentUser } from "@/actions/user.action";
+import { useAuth } from "@/hooks/useAuth";
+import { useToken } from "@/hooks/useToken";
+import { redirect } from "next/navigation";
+import { ProfileToggles } from "../_components/client/profile-toggles";
+import { SignOutButton } from "../_components/client/sign-out-button";
 
 const STATS = [
-  { label: "Products Scanned", value: "84", icon: Sparkle, color: "text-primary" },
-  { label: "Day Streak", value: "22", icon: Target, color: "text-secondary" },
-  { label: "Skin Health", value: "92%", icon: TrendingUp, color: "text-emerald-500" },
-  { label: "Badges", value: "5", icon: Award, color: "text-violet-500" },
+  { label: "Meals Logged", value: "342", icon: Flame, color: "text-primary" },
+  { label: "Day Streak", value: "14", icon: Target, color: "text-secondary" },
+  { label: "Avg Protein", value: "145g", icon: TrendingUp, color: "text-accent" },
+  { label: "Achievement", value: "12", icon: Award, color: "text-violet-500" },
 ];
 
 const PROGRESS_DATA = [
-  { week: "W1", score: 65 },
-  { week: "W2", score: 70 },
-  { week: "W3", score: 72 },
-  { week: "W4", score: 78 },
-  { week: "W5", score: 82 },
-  { week: "W6", score: 85 },
-  { week: "W7", score: 88 },
-  { week: "W8", score: 92 },
+  { week: "W1", weight: 82 },
+  { week: "W2", weight: 81.2 },
+  { week: "W3", weight: 80.5 },
+  { week: "W4", weight: 80.1 },
+  { week: "W5", weight: 79.3 },
+  { week: "W6", weight: 78.8 },
+  { week: "W7", weight: 78.2 },
+  { week: "W8", weight: 77.5 },
 ];
 
 const ACHIEVEMENTS = [
-  { label: "7-Day Streak", earned: true, icon: "✨" },
-  { label: "Clean Beauty", earned: true, icon: "🌿" },
-  { label: "Purity Master", earned: true, icon: "💧" },
+  { label: "7-Day Streak", earned: true, icon: "🔥" },
+  { label: "100 Meals", earned: true, icon: "🍽️" },
+  { label: "Protein King", earned: true, icon: "💪" },
   { label: "30-Day Streak", earned: false, icon: "⭐" },
-  { label: "100 Scans", earned: false, icon: "📸" },
+  { label: "500 Meals", earned: false, icon: "🏆" },
   { label: "1 Year", earned: false, icon: "👑" },
 ];
 
-export default function BeautyProfilePage() {
-  const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(true);
-  const minScore = 50;
-  const maxScore = 100;
+export default async function ProfilePage() {
+  const session = await useAuth();
+  if (!session) {
+    redirect("/auth");
+  }
+
+  const token = await useToken();
+  const user = await getCurrentUser(token);
+
+  if (!user || !user.isProfileCompleted) {
+    redirect("/complete-onboarding");
+  }
+
+  const minWeight = Math.min(...PROGRESS_DATA.map((d) => d.weight)) - 1;
+  const maxWeight = Math.max(...PROGRESS_DATA.map((d) => d.weight)) + 1;
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-8 max-w-[900px] mx-auto space-y-6">
@@ -79,8 +79,12 @@ export default function BeautyProfilePage() {
           <div className="flex flex-col sm:flex-row sm:items-end gap-4">
             {/* Avatar */}
             <div className="relative group">
-              <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-primary to-primary/60 flex items-center justify-center text-2xl font-bold text-primary-foreground border-4 border-card shadow-xl">
-                {USER.name.charAt(0)}
+              <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-primary to-primary/60 flex items-center justify-center text-2xl font-bold text-primary-foreground border-4 border-card shadow-xl overflow-hidden">
+                {user.avatar ? (
+                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                ) : (
+                  user.name.charAt(0)
+                )}
               </div>
               <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg bg-background border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors shadow-sm">
                 <Camera className="w-3.5 h-3.5" />
@@ -90,18 +94,18 @@ export default function BeautyProfilePage() {
             <div className="flex-1 sm:mb-1">
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-bold text-foreground">
-                  {USER.name}
+                  {user.name}
                 </h1>
                 <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                  {USER.plan}
+                  FREE
                 </span>
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
-               {USER.email}
+                {user.email}
               </p>
               <p className="text-[10px] text-muted-foreground/60 mt-0.5 flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
-                Member since {USER.joinDate}
+                Member since March 2024
               </p>
             </div>
             {/* Edit button */}
@@ -135,11 +139,11 @@ export default function BeautyProfilePage() {
       <div className="rounded-2xl border border-border/50 bg-card p-5">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-            <Sparkle className="w-4 h-4 text-primary" />
-            Skin Health Progress
+            <Scale className="w-4 h-4 text-primary" />
+            Weight Progress
           </h3>
           <span className="text-xs text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-full">
-            +{(PROGRESS_DATA[PROGRESS_DATA.length - 1].score - PROGRESS_DATA[0].score)}%
+            -{(PROGRESS_DATA[0].weight - PROGRESS_DATA[PROGRESS_DATA.length - 1].weight).toFixed(1)} kg
           </span>
         </div>
         {/* Simple line chart */}
@@ -162,8 +166,7 @@ export default function BeautyProfilePage() {
             <path
               d={`M${PROGRESS_DATA.map(
                 (d, i) =>
-                  `${(i / (PROGRESS_DATA.length - 1)) * 400},${
-                    120 - ((d.score - minScore) / (maxScore - minScore)) * 120
+                  `${(i / (PROGRESS_DATA.length - 1)) * 400},${120 - ((d.weight - minWeight) / (maxWeight - minWeight)) * 120
                   }`
               ).join(" L")} L400,120 L0,120 Z`}
               fill="url(#progressGradient)"
@@ -173,8 +176,7 @@ export default function BeautyProfilePage() {
             <polyline
               points={PROGRESS_DATA.map(
                 (d, i) =>
-                  `${(i / (PROGRESS_DATA.length - 1)) * 400},${
-                    120 - ((d.score - minScore) / (maxScore - minScore)) * 120
+                  `${(i / (PROGRESS_DATA.length - 1)) * 400},${120 - ((d.weight - minWeight) / (maxWeight - minWeight)) * 120
                   }`
               ).join(" ")}
               fill="none"
@@ -188,7 +190,7 @@ export default function BeautyProfilePage() {
               <circle
                 key={i}
                 cx={(i / (PROGRESS_DATA.length - 1)) * 400}
-                cy={120 - ((d.score - minScore) / (maxScore - minScore)) * 120}
+                cy={120 - ((d.weight - minWeight) / (maxWeight - minWeight)) * 120}
                 r={3}
                 fill="var(--primary)"
                 stroke="var(--card)"
@@ -260,82 +262,21 @@ export default function BeautyProfilePage() {
             Settings
           </h3>
         </div>
-        <div className="divide-y divide-border/30">
-          {/* Notifications */}
-          <div className="flex items-center justify-between px-5 py-3.5 hover:bg-muted/20 transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center">
-                <Bell className="w-4 h-4 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-foreground">
-                  Notifications
-                </p>
-                <p className="text-[10px] text-muted-foreground">
-                  Routine reminders & tips
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => setNotifications(!notifications)}
-              className={cn(
-                "w-10 h-6 rounded-full transition-all duration-200 relative",
-                notifications ? "bg-primary" : "bg-muted"
-              )}
-            >
-              <div
-                className={cn(
-                  "w-4 h-4 rounded-full bg-white shadow-sm absolute top-1 transition-all duration-200",
-                  notifications ? "left-5" : "left-1"
-                )}
-              />
-            </button>
-          </div>
-          {/* Dark Mode */}
-          <div className="flex items-center justify-between px-5 py-3.5 hover:bg-muted/20 transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center">
-                {darkMode ? (
-                  <Moon className="w-4 h-4 text-muted-foreground" />
-                ) : (
-                  <Sun className="w-4 h-4 text-muted-foreground" />
-                )}
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-foreground">
-                  Dark Mode
-                </p>
-                <p className="text-[10px] text-muted-foreground">
-                  Toggle theme appearance
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className={cn(
-                "w-10 h-6 rounded-full transition-all duration-200 relative",
-                darkMode ? "bg-primary" : "bg-muted"
-              )}
-            >
-              <div
-                className={cn(
-                  "w-4 h-4 rounded-full bg-white shadow-sm absolute top-1 transition-all duration-200",
-                  darkMode ? "left-5" : "left-1"
-                )}
-              />
-            </button>
-          </div>
+
+        <ProfileToggles />
+
+        <div className="divide-y divide-border/30 border-t border-border/30">
           {/* Menu items */}
           {[
             {
-              icon: Flower2,
-              label: "Skin Profile",
-              desc: "Update your skin type & concerns",
+              icon: Heart,
+              label: "Health Goals",
+              desc: "Update your fitness targets",
             },
             {
-              icon: Target,
-              label: "Product Preferences",
-              desc: "Ingredients to avoid",
+              icon: Dumbbell,
+              label: "Workout Integration",
+              desc: "Connect with fitness apps",
             },
             {
               icon: Shield,
@@ -368,34 +309,29 @@ export default function BeautyProfilePage() {
               <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
             </button>
           ))}
-          {/* Logout */}
-          <button className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-destructive/5 transition-colors text-left">
-            <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">
-              <LogOut className="w-4 h-4 text-destructive" />
-            </div>
-            <p className="text-xs font-semibold text-destructive">Sign Out</p>
-          </button>
+
+          <SignOutButton />
         </div>
       </div>
- 
+
       {/* ─── Mode Switcher ─── */}
       <div className="rounded-2xl border border-primary/20 bg-linear-to-br from-primary/5 via-transparent to-transparent p-6 relative overflow-hidden group">
         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 group-hover:opacity-20 transition-all duration-500">
-           <Flame className="w-24 h-24 text-primary" />
+          <Sparkles className="w-24 h-24 text-primary" />
         </div>
-        
+
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-              <Flame className="w-5 h-5 text-primary" />
-              Switch to Nutrition Mode
+              <Sparkles className="w-5 h-5 text-primary" />
+              Switch to Beauty Mode
             </h3>
             <p className="text-xs text-muted-foreground leading-relaxed max-w-[400px]">
-              Track your daily nutrition, scan food items for instant macro analysis, and get AI-powered meal plans for your transformation.
+              Explore AI-powered skincare analysis, routine planning, and beauty insights tailored to your skin profile.
             </p>
           </div>
           <Link
-            href="/nutrition/dashboard"
+            href="/beauty/dashboard"
             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
             Switch Now

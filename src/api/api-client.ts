@@ -1,15 +1,16 @@
+import { ENV } from "@/lib/env";
 import axios from "axios";
 import { signOut } from "../../auth";
 
-export const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
+export const apiClient = axios.create({
+    baseURL: ENV.API_URL,
     headers: {
         "Content-Type": "application/json",
     },
     withCredentials: true,
 });
 
-api.interceptors.response.use(
+apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {

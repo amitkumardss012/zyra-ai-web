@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "@/api/api";
+import { apiClient } from "@/api/api-client";
 import { cn } from "@/lib/utils";
 import { showError, showSuccess } from "@/utils/message";
 import {
@@ -10,14 +10,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Mars,
-  Ruler,
-  Scale,
   Sparkles,
   TrendingUp,
   User,
   UserPlus,
   Venus,
-  Zap,
+  Zap
 } from "lucide-react";
 import { useState } from "react";
 
@@ -107,7 +105,7 @@ export default function CompleteOnboardingPage() {
         payload.beautyGoals = formData.beautyGoals;
       }
 
-      const res = await api.put("/user/profile", payload);
+      const res = await apiClient.put("/user/profile", payload);
       if (res.data.success) {
         showSuccess("Profile completed successfully!");
         setStep(3);
@@ -150,8 +148,8 @@ export default function CompleteOnboardingPage() {
                     step === i
                       ? "bg-primary w-full"
                       : step > i
-                      ? "bg-primary/30 w-full"
-                      : "bg-muted w-full"
+                        ? "bg-primary/30 w-full"
+                        : "bg-muted w-full"
                   )}
                 />
                 <span className={cn(
@@ -245,7 +243,7 @@ export default function CompleteOnboardingPage() {
           {step === 2 && (
             <div className="space-y-6 animate-in slide-in-from-right-4 duration-300 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
               <div className="space-y-2">
-                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">
                   Current Age
                 </label>
                 <div className="relative group">

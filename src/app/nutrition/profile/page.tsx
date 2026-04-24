@@ -1,10 +1,7 @@
-"use client";
-
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import {
   Award,
-  Bell,
   Calendar,
   Camera,
   ChevronRight,
@@ -13,26 +10,19 @@ import {
   Flame,
   Heart,
   HelpCircle,
-  LogOut,
-  Moon,
   Scale,
   Settings,
   Shield,
   Sparkles,
-  Sun,
   Target,
   TrendingUp
 } from "lucide-react";
-import { useState } from "react";
-
-/* ─── Mock User Data ─── */
-const USER = {
-  name: "John Doe",
-  email: "john@example.com",
-  avatar: null,
-  joinDate: "March 2024",
-  plan: "Pro",
-};
+import { getCurrentUser } from "@/actions/user.action";
+import { useAuth } from "@/hooks/useAuth";
+import { useToken } from "@/hooks/useToken";
+import { redirect } from "next/navigation";
+import { ProfileToggles } from "../_components/client/profile-toggles";
+import { SignOutButton } from "../_components/client/sign-out-button";
 
 const STATS = [
   { label: "Meals Logged", value: "342", icon: Flame, color: "text-primary" },
@@ -61,9 +51,19 @@ const ACHIEVEMENTS = [
   { label: "1 Year", earned: false, icon: "👑" },
 ];
 
-export default function ProfilePage() {
-  const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(true);
+export default async function ProfilePage() {
+  const session = await useAuth();
+  if (!session) {
+    redirect("/auth");
+  }
+
+  const token = await useToken();
+  const user = await getCurrentUser(token);
+
+  if (!user || !user.isProfileCompleted) {
+    redirect("/complete-onboarding");
+  }
+
   const minWeight = Math.min(...PROGRESS_DATA.map((d) => d.weight)) - 1;
   const maxWeight = Math.max(...PROGRESS_DATA.map((d) => d.weight)) + 1;
 
@@ -79,8 +79,12 @@ export default function ProfilePage() {
           <div className="flex flex-col sm:flex-row sm:items-end gap-4">
             {/* Avatar */}
             <div className="relative group">
-              <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-primary to-primary/60 flex items-center justify-center text-2xl font-bold text-primary-foreground border-4 border-card shadow-xl">
-                {USER.name.charAt(0)}
+              <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-primary to-primary/60 flex items-center justify-center text-2xl font-bold text-primary-foreground border-4 border-card shadow-xl overflow-hidden">
+                {user.avatar ? (
+                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                ) : (
+                  user.name.charAt(0)
+                )}
               </div>
               <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg bg-background border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors shadow-sm">
                 <Camera className="w-3.5 h-3.5" />
@@ -90,18 +94,18 @@ export default function ProfilePage() {
             <div className="flex-1 sm:mb-1">
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-bold text-foreground">
-                  {USER.name}
+                  {user.name}
                 </h1>
                 <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                  {USER.plan}
+                  FREE
                 </span>
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {USER.email}
+                {user.email}
               </p>
               <p className="text-[10px] text-muted-foreground/60 mt-0.5 flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
-                Member since {USER.joinDate}
+                Member since March 2024
               </p>
             </div>
             {/* Edit button */}
@@ -162,8 +166,7 @@ export default function ProfilePage() {
             <path
               d={`M${PROGRESS_DATA.map(
                 (d, i) =>
-                  `${(i / (PROGRESS_DATA.length - 1)) * 400},${
-                    120 - ((d.weight - minWeight) / (maxWeight - minWeight)) * 120
+                  `${(i / (PROGRESS_DATA.length - 1)) * 400},${120 - ((d.weight - minWeight) / (maxWeight - minWeight)) * 120
                   }`
               ).join(" L")} L400,120 L0,120 Z`}
               fill="url(#progressGradient)"
@@ -173,8 +176,7 @@ export default function ProfilePage() {
             <polyline
               points={PROGRESS_DATA.map(
                 (d, i) =>
-                  `${(i / (PROGRESS_DATA.length - 1)) * 400},${
-                    120 - ((d.weight - minWeight) / (maxWeight - minWeight)) * 120
+                  `${(i / (PROGRESS_DATA.length - 1)) * 400},${120 - ((d.weight - minWeight) / (maxWeight - minWeight)) * 120
                   }`
               ).join(" ")}
               fill="none"
@@ -260,71 +262,10 @@ export default function ProfilePage() {
             Settings
           </h3>
         </div>
-        <div className="divide-y divide-border/30">
-          {/* Notifications */}
-          <div className="flex items-center justify-between px-5 py-3.5 hover:bg-muted/20 transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center">
-                <Bell className="w-4 h-4 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-foreground">
-                  Notifications
-                </p>
-                <p className="text-[10px] text-muted-foreground">
-                  Meal reminders & daily reports
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => setNotifications(!notifications)}
-              className={cn(
-                "w-10 h-6 rounded-full transition-all duration-200 relative",
-                notifications ? "bg-primary" : "bg-muted"
-              )}
-            >
-              <div
-                className={cn(
-                  "w-4 h-4 rounded-full bg-white shadow-sm absolute top-1 transition-all duration-200",
-                  notifications ? "left-5" : "left-1"
-                )}
-              />
-            </button>
-          </div>
-          {/* Dark Mode */}
-          <div className="flex items-center justify-between px-5 py-3.5 hover:bg-muted/20 transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center">
-                {darkMode ? (
-                  <Moon className="w-4 h-4 text-muted-foreground" />
-                ) : (
-                  <Sun className="w-4 h-4 text-muted-foreground" />
-                )}
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-foreground">
-                  Dark Mode
-                </p>
-                <p className="text-[10px] text-muted-foreground">
-                  Toggle theme appearance
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className={cn(
-                "w-10 h-6 rounded-full transition-all duration-200 relative",
-                darkMode ? "bg-primary" : "bg-muted"
-              )}
-            >
-              <div
-                className={cn(
-                  "w-4 h-4 rounded-full bg-white shadow-sm absolute top-1 transition-all duration-200",
-                  darkMode ? "left-5" : "left-1"
-                )}
-              />
-            </button>
-          </div>
+
+        <ProfileToggles />
+
+        <div className="divide-y divide-border/30 border-t border-border/30">
           {/* Menu items */}
           {[
             {
@@ -368,22 +309,17 @@ export default function ProfilePage() {
               <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
             </button>
           ))}
-          {/* Logout */}
-          <button className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-destructive/5 transition-colors text-left">
-            <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">
-              <LogOut className="w-4 h-4 text-destructive" />
-            </div>
-            <p className="text-xs font-semibold text-destructive">Sign Out</p>
-          </button>
+
+          <SignOutButton />
         </div>
       </div>
- 
+
       {/* ─── Mode Switcher ─── */}
       <div className="rounded-2xl border border-primary/20 bg-linear-to-br from-primary/5 via-transparent to-transparent p-6 relative overflow-hidden group">
         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 group-hover:opacity-20 transition-all duration-500">
-           <Sparkles className="w-24 h-24 text-primary" />
+          <Sparkles className="w-24 h-24 text-primary" />
         </div>
-        
+
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <h3 className="text-base font-bold text-foreground flex items-center gap-2">
@@ -406,3 +342,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+  
