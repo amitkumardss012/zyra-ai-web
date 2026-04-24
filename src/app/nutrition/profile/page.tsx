@@ -1,5 +1,7 @@
+import { getCurrentUser } from "@/actions/user.action";
+import { useAuth } from "@/hooks/useAuth";
+import { useToken } from "@/hooks/useToken";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import {
   Award,
   Calendar,
@@ -17,9 +19,7 @@ import {
   Target,
   TrendingUp
 } from "lucide-react";
-import { getCurrentUser } from "@/actions/user.action";
-import { useAuth } from "@/hooks/useAuth";
-import { useToken } from "@/hooks/useToken";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ProfileToggles } from "../_components/client/profile-toggles";
 import { SignOutButton } from "../_components/client/sign-out-button";
