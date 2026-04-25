@@ -20,6 +20,8 @@ import {
   Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { scanFoodAction } from "@/actions/nutrition.action";
+import { showError, showSuccess } from "@/utils/message";
 
 /* ─── Types ─── */
 interface NutrientResult {
@@ -45,30 +47,6 @@ interface FoodResult {
   healthScore: number;
   tags: string[];
 }
-
-/* ─── Mock AI Result ─── */
-const MOCK_RESULT: FoodResult = {
-  name: "Grilled Chicken Breast with Rice & Broccoli",
-  servingSize: "350g (approx.)",
-  calories: 485,
-  protein: 52,
-  carbs: 42,
-  fats: 12,
-  fiber: 6,
-  sugar: 3,
-  sodium: 680,
-  cholesterol: 125,
-  healthScore: 92,
-  tags: ["High Protein", "Low Fat", "Muscle Building", "Whole Foods"],
-  nutrients: [
-    { name: "Vitamin A", amount: "120", unit: "mcg", dailyValue: 13, color: "from-amber-400 to-orange-500" },
-    { name: "Vitamin C", amount: "58", unit: "mg", dailyValue: 64, color: "from-yellow-400 to-amber-500" },
-    { name: "Vitamin B6", amount: "0.9", unit: "mg", dailyValue: 53, color: "from-violet-400 to-purple-500" },
-    { name: "Iron", amount: "2.4", unit: "mg", dailyValue: 13, color: "from-red-400 to-rose-500" },
-    { name: "Potassium", amount: "620", unit: "mg", dailyValue: 13, color: "from-emerald-400 to-green-500" },
-    { name: "Calcium", amount: "78", unit: "mg", dailyValue: 6, color: "from-blue-400 to-indigo-500" },
-  ],
-};
 
 export default function ScannerPage() {
   const [dragOver, setDragOver] = useState(false);
@@ -98,13 +76,50 @@ export default function ScannerPage() {
     [handleFile]
   );
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
+    if (!preview) return;
+    
     setAnalyzing(true);
-    // Simulate AI analysis
-    setTimeout(() => {
-      setResult(MOCK_RESULT);
+    try {
+      const formData = new FormData();
+      formData.append("image", preview);
+      formData.append("mealType", "LUNCH");
+
+      const data = await scanFoodAction(formData);
+      
+      if (data) {
+        // Map the flat backend data to the frontend's expected format
+        const mappedResult: FoodResult = {
+          name: data.name,
+          servingSize: data.servingSize || "N/A",
+          calories: data.calories,
+          protein: data.protein,
+          carbs: data.carbs,
+          fats: data.fats,
+          fiber: data.fiber || 0,
+          sugar: data.sugar || 0,
+          sodium: data.sodium || 0,
+          cholesterol: data.cholesterol || 0,
+          healthScore: data.healthScore,
+          tags: data.tags,
+          nutrients: [
+            { name: "Vitamin A", amount: data.vitaminA?.toString() || "0", unit: "mcg", dailyValue: Math.round((data.vitaminA || 0) / 9), color: "from-amber-400 to-orange-500" },
+            { name: "Vitamin C", amount: data.vitaminC?.toString() || "0", unit: "mg", dailyValue: Math.round((data.vitaminC || 0) / 0.9), color: "from-yellow-400 to-amber-500" },
+            { name: "Vitamin B6", amount: data.vitaminB6?.toString() || "0", unit: "mg", dailyValue: Math.round((data.vitaminB6 || 0) / 0.017), color: "from-violet-400 to-purple-500" },
+            { name: "Iron", amount: data.iron?.toString() || "0", unit: "mg", dailyValue: Math.round((data.iron || 0) / 0.18), color: "from-red-400 to-rose-500" },
+            { name: "Potassium", amount: data.potassium?.toString() || "0", unit: "mg", dailyValue: Math.round((data.potassium || 0) / 47), color: "from-emerald-400 to-green-500" },
+            { name: "Calcium", amount: data.calcium?.toString() || "0", unit: "mg", dailyValue: Math.round((data.calcium || 0) / 13), color: "from-blue-400 to-indigo-500" },
+          ].filter(n => parseFloat(n.amount) > 0)
+        };
+        
+        setResult(mappedResult);
+        showSuccess("Analysis complete!");
+      }
+    } catch (error) {
+      showError(error);
+    } finally {
       setAnalyzing(false);
-    }, 2500);
+    }
   };
 
   const handleReset = () => {
