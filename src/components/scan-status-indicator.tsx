@@ -18,7 +18,7 @@ export function ScanStatusIndicator() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-[100] animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed bottom-6 right-6 z-100 animate-in slide-in-from-bottom-4 duration-300">
       <div className={cn(
         "flex flex-col gap-3 p-4 rounded-3xl border shadow-2xl backdrop-blur-md transition-all duration-500 min-w-[280px]",
         isScanning 
