@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import {
   ScanLine,
   Upload,
@@ -20,8 +20,7 @@ import {
   Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { scanFoodAction } from "@/actions/nutrition.action";
-import { showError, showSuccess } from "@/utils/message";
+import { useScan } from "@/providers/scan-provider";
 
 /* ─── Types ─── */
 interface NutrientResult {
@@ -49,22 +48,56 @@ interface FoodResult {
 }
 
 export default function ScannerPage() {
+  const { isScanning, lastResult, lastImage, startScan, resetScan } = useScan();
   const [dragOver, setDragOver] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [result, setResult] = useState<FoodResult | null>(null);
+  const [preview, setPreview] = useState<string | null>(lastImage);
   const [showDetails, setShowDetails] = useState(false);
+  const [mappedResult, setMappedResult] = useState<FoodResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync global result with local display mapping and preview
+  useEffect(() => {
+    if (lastImage) setPreview(lastImage);
+    
+    if (lastResult) {
+      const data = lastResult as any;
+      const mapped: FoodResult = {
+        name: data.name,
+        servingSize: data.servingSize || "N/A",
+        calories: data.calories,
+        protein: data.protein,
+        carbs: data.carbs,
+        fats: data.fats,
+        fiber: data.fiber || 0,
+        sugar: data.sugar || 0,
+        sodium: data.sodium || 0,
+        cholesterol: data.cholesterol || 0,
+        healthScore: data.healthScore,
+        tags: data.tags,
+        nutrients: [
+          { name: "Vitamin A", amount: data.vitaminA?.toString() || "0", unit: "mcg", dailyValue: Math.round((data.vitaminA || 0) / 9), color: "from-amber-400 to-orange-500" },
+          { name: "Vitamin C", amount: data.vitaminC?.toString() || "0", unit: "mg", dailyValue: Math.round((data.vitaminC || 0) / 0.9), color: "from-yellow-400 to-amber-500" },
+          { name: "Vitamin B6", amount: data.vitaminB6?.toString() || "0", unit: "mg", dailyValue: Math.round((data.vitaminB6 || 0) / 0.017), color: "from-violet-400 to-purple-500" },
+          { name: "Iron", amount: data.iron?.toString() || "0", unit: "mg", dailyValue: Math.round((data.iron || 0) / 0.18), color: "from-red-400 to-rose-500" },
+          { name: "Potassium", amount: data.potassium?.toString() || "0", unit: "mg", dailyValue: Math.round((data.potassium || 0) / 47), color: "from-emerald-400 to-green-500" },
+          { name: "Calcium", amount: data.calcium?.toString() || "0", unit: "mg", dailyValue: Math.round((data.calcium || 0) / 13), color: "from-blue-400 to-indigo-500" },
+        ].filter(n => parseFloat(n.amount) > 0)
+      };
+      setMappedResult(mapped);
+    } else {
+      setMappedResult(null);
+    }
+  }, [lastResult]);
 
   const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) return;
     const reader = new FileReader();
     reader.onload = (e) => {
       setPreview(e.target?.result as string);
-      setResult(null);
+      resetScan();
     };
     reader.readAsDataURL(file);
-  }, []);
+  }, [resetScan]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -78,53 +111,12 @@ export default function ScannerPage() {
 
   const handleAnalyze = async () => {
     if (!preview) return;
-    
-    setAnalyzing(true);
-    try {
-      const formData = new FormData();
-      formData.append("image", preview);
-      formData.append("mealType", "LUNCH");
-
-      const data = await scanFoodAction(formData);
-      
-      if (data) {
-        // Map the flat backend data to the frontend's expected format
-        const mappedResult: FoodResult = {
-          name: data.name,
-          servingSize: data.servingSize || "N/A",
-          calories: data.calories,
-          protein: data.protein,
-          carbs: data.carbs,
-          fats: data.fats,
-          fiber: data.fiber || 0,
-          sugar: data.sugar || 0,
-          sodium: data.sodium || 0,
-          cholesterol: data.cholesterol || 0,
-          healthScore: data.healthScore,
-          tags: data.tags,
-          nutrients: [
-            { name: "Vitamin A", amount: data.vitaminA?.toString() || "0", unit: "mcg", dailyValue: Math.round((data.vitaminA || 0) / 9), color: "from-amber-400 to-orange-500" },
-            { name: "Vitamin C", amount: data.vitaminC?.toString() || "0", unit: "mg", dailyValue: Math.round((data.vitaminC || 0) / 0.9), color: "from-yellow-400 to-amber-500" },
-            { name: "Vitamin B6", amount: data.vitaminB6?.toString() || "0", unit: "mg", dailyValue: Math.round((data.vitaminB6 || 0) / 0.017), color: "from-violet-400 to-purple-500" },
-            { name: "Iron", amount: data.iron?.toString() || "0", unit: "mg", dailyValue: Math.round((data.iron || 0) / 0.18), color: "from-red-400 to-rose-500" },
-            { name: "Potassium", amount: data.potassium?.toString() || "0", unit: "mg", dailyValue: Math.round((data.potassium || 0) / 47), color: "from-emerald-400 to-green-500" },
-            { name: "Calcium", amount: data.calcium?.toString() || "0", unit: "mg", dailyValue: Math.round((data.calcium || 0) / 13), color: "from-blue-400 to-indigo-500" },
-          ].filter(n => parseFloat(n.amount) > 0)
-        };
-        
-        setResult(mappedResult);
-        showSuccess("Analysis complete!");
-      }
-    } catch (error) {
-      showError(error);
-    } finally {
-      setAnalyzing(false);
-    }
+    await startScan(preview, "LUNCH");
   };
 
   const handleReset = () => {
     setPreview(null);
-    setResult(null);
+    resetScan();
     setShowDetails(false);
   };
 
@@ -134,7 +126,10 @@ export default function ScannerPage() {
       <div>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-linear-to-br from-primary to-primary/60 shadow-lg shadow-primary/20">
-            <ScanLine className="w-5 h-5 text-primary-foreground" />
+            <span className="relative">
+              <ScanLine className="w-5 h-5 text-primary-foreground" />
+              {isScanning && <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-accent animate-pulse" />}
+            </span>
           </div>
           Food Scanner
         </h1>
@@ -217,7 +212,7 @@ export default function ScannerPage() {
                   alt="Food preview"
                   className="w-full h-full object-cover"
                 />
-                {analyzing && (
+                {isScanning && (
                   <div className="absolute inset-0 bg-background/60 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
                     <div className="relative">
                       <div className="w-16 h-16 rounded-full border-2 border-primary/20 flex items-center justify-center">
@@ -246,19 +241,19 @@ export default function ScannerPage() {
                 </div>
               </div>
               {/* Analyze button */}
-              {!result && (
+              {!mappedResult && (
                 <div className="p-4">
                   <button
                     onClick={handleAnalyze}
-                    disabled={analyzing}
+                    disabled={isScanning}
                     className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-200 active:scale-[0.98] disabled:opacity-50"
                   >
-                    {analyzing ? (
+                    {isScanning ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       <Sparkles className="w-4 h-4" />
                     )}
-                    {analyzing ? "Analyzing..." : "Analyze with AI"}
+                    {isScanning ? "Analyzing..." : "Analyze with AI"}
                   </button>
                 </div>
               )}
@@ -284,7 +279,7 @@ export default function ScannerPage() {
 
         {/* ─── Results Panel ─── */}
         <div className="space-y-4">
-          {result ? (
+          {mappedResult ? (
             <>
               {/* Food name & health score */}
               <div className="rounded-2xl border border-border/50 bg-card p-5 space-y-4">
@@ -297,24 +292,24 @@ export default function ScannerPage() {
                       </span>
                     </div>
                     <h2 className="text-lg font-bold text-foreground leading-tight">
-                      {result.name}
+                      {mappedResult.name}
                     </h2>
                     <p className="text-xs text-muted-foreground">
-                      Serving: {result.servingSize}
+                      Serving: {mappedResult.servingSize}
                     </p>
                   </div>
                   <div className="flex flex-col items-center">
                     <div
                       className={cn(
                         "w-14 h-14 rounded-xl flex items-center justify-center font-bold text-lg",
-                        result.healthScore >= 80
+                        mappedResult.healthScore >= 80
                           ? "bg-primary/10 text-primary"
-                          : result.healthScore >= 60
+                          : mappedResult.healthScore >= 60
                           ? "bg-secondary/10 text-secondary"
                           : "bg-destructive/10 text-destructive"
                       )}
                     >
-                      {result.healthScore}
+                      {mappedResult.healthScore}
                     </div>
                     <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mt-1">
                       Health
@@ -323,7 +318,7 @@ export default function ScannerPage() {
                 </div>
                 {/* Tags */}
                 <div className="flex flex-wrap gap-1.5">
-                  {result.tags.map((tag) => (
+                  {mappedResult.tags.map((tag) => (
                     <span
                       key={tag}
                       className="inline-flex items-center px-2 py-0.5 rounded-md bg-primary/5 text-[10px] font-semibold text-primary border border-primary/10"
@@ -343,28 +338,28 @@ export default function ScannerPage() {
                   {[
                     {
                       label: "Calories",
-                      value: result.calories,
+                      value: mappedResult.calories,
                       unit: "kcal",
                       icon: Flame,
                       gradient: "from-primary to-primary/60",
                     },
                     {
                       label: "Protein",
-                      value: result.protein,
+                      value: mappedResult.protein,
                       unit: "g",
                       icon: Drumstick,
                       gradient: "from-emerald-500 to-green-500",
                     },
                     {
                       label: "Carbs",
-                      value: result.carbs,
+                      value: mappedResult.carbs,
                       unit: "g",
                       icon: Wheat,
                       gradient: "from-secondary to-secondary/60",
                     },
                     {
                       label: "Fats",
-                      value: result.fats,
+                      value: mappedResult.fats,
                       unit: "g",
                       icon: Droplets,
                       gradient: "from-accent to-accent/60",
@@ -400,10 +395,10 @@ export default function ScannerPage() {
                 {/* Additional macros */}
                 <div className="grid grid-cols-4 gap-2 mt-3">
                   {[
-                    { label: "Fiber", value: `${result.fiber}g` },
-                    { label: "Sugar", value: `${result.sugar}g` },
-                    { label: "Sodium", value: `${result.sodium}mg` },
-                    { label: "Cholest.", value: `${result.cholesterol}mg` },
+                    { label: "Fiber", value: `${mappedResult.fiber}g` },
+                    { label: "Sugar", value: `${mappedResult.sugar}g` },
+                    { label: "Sodium", value: `${mappedResult.sodium}mg` },
+                    { label: "Cholest.", value: `${mappedResult.cholesterol}mg` },
                   ].map((item) => (
                     <div
                       key={item.label}
@@ -439,7 +434,7 @@ export default function ScannerPage() {
                 </button>
                 {showDetails && (
                   <div className="px-5 pb-5 space-y-2 animate-in slide-in-from-top-2 duration-200">
-                    {result.nutrients.map((n) => (
+                    {mappedResult.nutrients.map((n) => (
                       <div
                         key={n.name}
                         className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/20"

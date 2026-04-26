@@ -5,6 +5,8 @@ import AuthProvider from "@/providers/auth-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import SessionProviderWrapper from "@/providers/session-provider";
+import { ScanProvider } from "@/providers/scan-provider";
+import { ScanStatusIndicator } from "@/components/scan-status-indicator";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -56,8 +58,11 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider>
             <SessionProviderWrapper>
-              {children}
-              <Toaster />
+              <ScanProvider>
+                {children}
+                <ScanStatusIndicator />
+                <Toaster />
+              </ScanProvider>
             </SessionProviderWrapper>
           </ThemeProvider>
         </AuthProvider>
