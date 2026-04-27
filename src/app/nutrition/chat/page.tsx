@@ -15,6 +15,9 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { apiClient } from "@/api/api-client";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 /* ─── Types ─── */
 interface Message {
@@ -48,25 +51,6 @@ const QUICK_PROMPTS = [
   },
 ];
 
-/* ─── Mock AI response ─── */
-const MOCK_RESPONSES: Record<string, string> = {
-  default: `Great question! Here's what I recommend:
-
-**🥩 Top High-Protein Foods:**
-1. **Chicken Breast** — 31g protein per 100g
-2. **Greek Yogurt** — 10g protein per 100g
-3. **Eggs** — 6g protein per egg
-4. **Salmon** — 25g protein per 100g
-5. **Lentils** — 9g protein per 100g
-
-**💡 Pro Tips:**
-- Aim for 1.6-2.2g of protein per kg of bodyweight
-- Spread protein intake across 4-5 meals
-- Combine with complex carbs for sustained energy
-
-Would you like me to create a detailed meal plan based on your goals?`,
-};
-
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -81,9 +65,9 @@ export default function ChatPage() {
     });
   }, [messages, isTyping]);
 
-  const handleSend = (text?: string) => {
+  const handleSend = async (text?: string) => {
     const content = text || input.trim();
-    if (!content) return;
+    if (!content || isTyping) return;
 
     const userMsg: Message = {
       id: Date.now().toString(),
@@ -96,17 +80,31 @@ export default function ChatPage() {
     setInput("");
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      const response = await apiClient.post("/nutrition/chat", {
+        messages: content,
+      });
+
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: MOCK_RESPONSES.default,
+        content: response.data.data,
         timestamp: new Date(),
       };
+
       setMessages((prev) => [...prev, assistantMsg]);
+    } catch (error) {
+      console.error("Chat error:", error);
+      const errorMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: "Sorry, I encountered an error. Please try again.",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMsg]);
+    } finally {
       setIsTyping(false);
-    }, 1500 + Math.random() * 1000);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -209,19 +207,91 @@ export default function ChatPage() {
                 )}
                 <div
                   className={cn(
-                    "max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
+                    "max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
                     msg.role === "user"
-                      ? "bg-primary text-primary-foreground rounded-tr-sm"
-                      : "bg-card border border-border/50 text-foreground rounded-tl-sm"
+                      ? "bg-primary text-primary-foreground rounded-tr-sm shadow-lg shadow-primary/10"
+                      : "bg-card border border-border/50 text-foreground rounded-tl-sm shadow-xs"
                   )}
                 >
-                  <div className="whitespace-pre-wrap">{msg.content}</div>
+                  {msg.role === "assistant" ? (
+                    <div className="assistant-message overflow-hidden">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          h1: ({ ...props }) => (
+                            <h1
+                              className="text-lg font-bold mt-4 mb-2 text-foreground"
+                              {...props}
+                            />
+                          ),
+                          h2: ({ ...props }) => (
+                            <h2
+                              className="text-base font-bold mt-3 mb-1.5 text-foreground"
+                              {...props}
+                            />
+                          ),
+                          h3: ({ ...props }) => (
+                            <h3
+                              className="text-sm font-bold mt-2.5 mb-1 text-foreground"
+                              {...props}
+                            />
+                          ),
+                          p: ({ ...props }) => (
+                            <p className="mb-2 last:mb-0" {...props} />
+                          ),
+                          ul: ({ ...props }) => (
+                            <ul
+                              className="list-disc ml-4 mb-3 space-y-1"
+                              {...props}
+                            />
+                          ),
+                          ol: ({ ...props }) => (
+                            <ol
+                              className="list-decimal ml-4 mb-3 space-y-1"
+                              {...props}
+                            />
+                          ),
+                          li: ({ ...props }) => (
+                            <li className="mb-0.5" {...props} />
+                          ),
+                          hr: ({ ...props }) => (
+                            <hr
+                              className="my-4 border-border/40"
+                              {...props}
+                            />
+                          ),
+                          strong: ({ ...props }) => (
+                            <strong
+                              className="font-bold text-primary/90"
+                              {...props}
+                            />
+                          ),
+                          code: ({ ...props }) => (
+                            <code
+                              className="bg-muted px-1.5 py-0.5 rounded-md text-xs font-mono"
+                              {...props}
+                            />
+                          ),
+                          blockquote: ({ ...props }) => (
+                            <blockquote
+                              className="border-l-2 border-primary/20 pl-4 my-2 italic text-muted-foreground"
+                              {...props}
+                            />
+                          ),
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
+                    </div>
+                  ) : (
+                    <div className="whitespace-pre-wrap">{msg.content}</div>
+                  )}
                   <p
                     className={cn(
-                      "text-[9px] mt-2 font-medium",
+                      "text-[9px] mt-2 font-medium opacity-60",
                       msg.role === "user"
-                        ? "text-primary-foreground/50"
-                        : "text-muted-foreground/50"
+                        ? "text-primary-foreground"
+                        : "text-muted-foreground"
                     )}
                   >
                     {msg.timestamp.toLocaleTimeString([], {
