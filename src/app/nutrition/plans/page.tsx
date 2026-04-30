@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { 
+import {
   ClipboardList,
-  ChevronLeft, 
-  ChevronRight, 
+  ChevronLeft,
+  ChevronRight,
   Target,
   Calendar,
   Zap,
@@ -73,7 +73,7 @@ export default function PlansPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <Link 
+          <Link
             href="/nutrition/dashboard"
             className="p-2 rounded-xl bg-muted/50 hover:bg-muted transition-colors"
           >
@@ -89,7 +89,7 @@ export default function PlansPage() {
           </div>
         </div>
 
-        <Link 
+        <Link
           href="/nutrition/planner"
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all"
         >
@@ -106,7 +106,7 @@ export default function PlansPage() {
       ) : plans.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {plans.map((plan) => (
-            <div 
+            <div
               key={plan.id}
               className="group relative rounded-2xl border border-border/50 bg-card p-6 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300"
             >
@@ -160,7 +160,7 @@ export default function PlansPage() {
                     <span className="text-sm font-bold text-foreground">Advanced</span>
                   </div>
                 </div>
-                
+
                 <button className="flex items-center gap-1 text-xs font-bold text-primary group-hover:gap-2 transition-all">
                   View Full Plan
                   <ChevronRightIcon className="w-4 h-4" />
@@ -181,7 +181,7 @@ export default function PlansPage() {
           <p className="text-sm text-muted-foreground mt-1 max-w-[280px]">
             Ready to transform? Let our AI generate a personalized nutrition and workout plan for you.
           </p>
-          <Link 
+          <Link
             href="/nutrition/planner"
             className="mt-6 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all"
           >
@@ -193,7 +193,7 @@ export default function PlansPage() {
       {/* Pagination */}
       {pagination.totalPages > 1 && (
         <div className="flex items-center justify-center gap-4 pt-6">
-          <button 
+          <button
             onClick={() => handlePageChange(pagination.page - 1)}
             disabled={pagination.page === 1}
             className="p-2 rounded-xl bg-card border border-border disabled:opacity-50 hover:bg-muted transition-colors"
@@ -203,7 +203,7 @@ export default function PlansPage() {
           <div className="text-sm font-bold">
             Page <span className="text-primary">{pagination.page}</span> of {pagination.totalPages}
           </div>
-          <button 
+          <button
             onClick={() => handlePageChange(pagination.page + 1)}
             disabled={pagination.page === pagination.totalPages}
             className="p-2 rounded-xl bg-card border border-border disabled:opacity-50 hover:bg-muted transition-colors"
