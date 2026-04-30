@@ -335,7 +335,7 @@ export default function PlansPage() {
                         { label: "Carbs", value: `${selectedPlan.carbsGrams}g`, unit: "", icon: Activity, color: "text-blue-500", border: "border-blue-500/20" },
                         { label: "Fats", value: `${selectedPlan.fatsGrams}g`, unit: "", icon: Droplets, color: "text-purple-500", border: "border-purple-500/20" },
                       ].map(stat => (
-                        <div key={stat.label} className={cn("p-5 rounded-3xl bg-white/5 border backdrop-blur-xs flex flex-col items-center text-center gap-1.5 transition-all hover:bg-white/[0.08]", stat.border)}>
+                        <div key={stat.label} className={cn("p-5 rounded-3xl bg-white/5 border backdrop-blur-xs flex flex-col items-center text-center gap-1.5 transition-all hover:bg-white/8", stat.border)}>
                           <stat.icon className={cn("w-5 h-5 mb-1", stat.color)} />
                           <div className="text-2xl font-black tracking-tight text-white">{stat.value}</div>
                           <div className="text-[10px] font-bold opacity-40 uppercase tracking-[0.15em]">{stat.label}</div>
@@ -345,7 +345,7 @@ export default function PlansPage() {
 
                     {/* Guidelines Section */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                       <div className="p-6 rounded-[2rem] bg-emerald-500/[0.03] border border-emerald-500/10 space-y-5">
+                       <div className="p-6 rounded-[2rem] bg-emerald-500/3 border border-emerald-500/10 space-y-5">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center">
                               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
@@ -362,7 +362,7 @@ export default function PlansPage() {
                           </div>
                        </div>
                        
-                       <div className="p-6 rounded-[2rem] bg-rose-500/[0.03] border border-rose-500/10 space-y-5">
+                       <div className="p-6 rounded-[2rem] bg-rose-500/3 border border-rose-500/10 space-y-5">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-xl bg-rose-500/10 flex items-center justify-center">
                               <AlertCircle className="w-4 h-4 text-rose-500" />
@@ -381,7 +381,7 @@ export default function PlansPage() {
                     </div>
 
                     {/* AI Wisdom */}
-                    <div className="relative group p-8 rounded-[2.5rem] bg-linear-to-br from-amber-500/[0.08] to-transparent border border-amber-500/10 overflow-hidden">
+                    <div className="relative group p-8 rounded-[2.5rem] bg-linear-to-br from-amber-500/8 to-transparent border border-amber-500/10 overflow-hidden">
                        <div className="absolute -bottom-8 -right-8 opacity-5 group-hover:scale-110 transition-transform duration-700">
                          <Lightbulb className="w-32 h-32 text-amber-500" />
                        </div>
@@ -415,7 +415,7 @@ export default function PlansPage() {
                                )}
                             </div>
                             <div className="flex-1 pb-8">
-                               <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/[0.08] hover:border-primary/30 transition-all duration-300">
+                               <div className="p-6 rounded-3xl bg-white/3 border border-white/8 hover:border-primary/30 transition-all duration-300">
                                   <div className="flex items-center justify-between mb-4">
                                      <h5 className="text-base font-black text-white">{meal.mealName}</h5>
                                      <div className="px-3 py-1 rounded-lg bg-white/5 border border-white/5 text-[10px] font-bold text-white/60">
@@ -453,7 +453,7 @@ export default function PlansPage() {
                              
                              <div className="grid grid-cols-1 gap-3 pl-4 border-l border-white/5 ml-5">
                                 {day.exercises.map((ex, j) => (
-                                  <div key={j} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] transition-all">
+                                  <div key={j} className="flex items-center justify-between p-5 rounded-2xl bg-white/2 border border-white/5 hover:bg-white/4 transition-all">
                                      <div className="space-y-1">
                                         <p className="text-sm font-bold text-white/90">{ex.name}</p>
                                         <p className="text-[10px] text-white/40 italic">{ex.notes || "Controlled movement"}</p>
