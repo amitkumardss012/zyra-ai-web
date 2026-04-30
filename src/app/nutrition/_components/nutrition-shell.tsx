@@ -15,6 +15,7 @@ import {
   Sparkle,
   LogOut,
   RefreshCcw,
+  Lock,
 } from "lucide-react";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
@@ -156,33 +157,35 @@ export function NutritionShell({ children }: { children: React.ReactNode }) {
             </span>
           )}
           
-          {/* Mode Switcher */}
-          <Link
-            href="/beauty/dashboard"
+          {/* Mode Switcher (Locked) */}
+          <div
             className={cn(
                "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 relative",
                collapsed && "justify-center px-0",
-               "text-muted-foreground hover:text-pink-500 hover:bg-pink-500/10"
+               "text-muted-foreground/40 cursor-not-allowed grayscale"
             )}
           >
-            <Sparkle className={cn(
+            <Lock className={cn(
               "shrink-0 transition-colors duration-200",
               collapsed ? "w-5 h-5" : "w-[18px] h-[18px]"
             )} />
             {!collapsed && (
                <div className="flex flex-col animate-in fade-in duration-200">
-                <span>Switch to Beauty</span>
-                <span className="text-[10px] text-muted-foreground/60 font-normal">
-                  Toggle AI modules
+                <div className="flex items-center gap-2">
+                  <span>Beauty Mode</span>
+                  <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-muted border border-border font-bold uppercase tracking-tighter">Soon</span>
+                </div>
+                <span className="text-[10px] text-muted-foreground/40 font-normal">
+                  Locked for now
                 </span>
               </div>
             )}
             {collapsed && (
               <div className="absolute left-full ml-2 px-2.5 py-1 rounded-md bg-popover border border-border text-xs font-medium text-popover-foreground shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
-                Switch to Beauty
+                Coming Soon
               </div>
             )}
-          </Link>
+          </div>
 
           {/* Logout */}
           <button
