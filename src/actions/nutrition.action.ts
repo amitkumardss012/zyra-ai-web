@@ -1,7 +1,6 @@
 // "use server";
 
 import { apiClient } from "@/api/api-client";
-import { auth } from "../../auth";
 
 /**
  * Server action to scan food image.
@@ -23,6 +22,34 @@ export const scanFoodAction = async (formData: FormData) => {
     return res.data.data;
   } catch (error) {
     console.error("Error in scanFoodAction:", error);
+    throw error;
+  }
+};
+
+export const getNutritionLogsAction = async (params?: {
+  page?: number;
+  limit?: number;
+  startDate?: string;
+  endDate?: string;
+}) => {
+  try {
+    const res = await apiClient.get("/nutrition/logs", { params });
+    return res.data.data;
+  } catch (error) {
+    console.error("Error in getNutritionLogsAction:", error);
+    throw error;
+  }
+};
+
+export const getPlansAction = async (params?: {
+  page?: number;
+  limit?: number;
+}) => {
+  try {
+    const res = await apiClient.get("/nutrition/plans", { params });
+    return res.data.data;
+  } catch (error) {
+    console.error("Error in getPlansAction:", error);
     throw error;
   }
 };

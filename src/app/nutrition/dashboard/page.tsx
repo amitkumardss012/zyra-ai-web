@@ -31,6 +31,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+import Link from "next/link";
 
 /* ─── Mock Data ─── */
 const DAILY_STATS = {
@@ -475,9 +476,12 @@ export default function DashboardPage() {
               <Apple className="w-4 h-4 text-primary" />
               Recent Meals
             </h3>
-            <button className="text-xs text-muted-foreground hover:text-foreground font-medium flex items-center gap-1 transition-colors">
+            <Link
+              href="/nutrition/logs"
+              className="text-xs text-muted-foreground hover:text-foreground font-medium flex items-center gap-1 transition-colors"
+            >
               View all <ChevronRight className="w-3 h-3" />
-            </button>
+            </Link>
           </div>
           <div className="space-y-2">
             {RECENT_MEALS.map((meal) => (

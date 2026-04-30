@@ -33,6 +33,12 @@ const NAV_ITEMS = [
     description: "Scan your food",
   },
   {
+    label: "History",
+    href: "/nutrition/logs",
+    icon: RefreshCcw,
+    description: "Your food logs",
+  },
+  {
     label: "Chat",
     href: "/nutrition/chat",
     icon: MessageSquare,
@@ -42,7 +48,13 @@ const NAV_ITEMS = [
     label: "Planner",
     href: "/nutrition/planner",
     icon: CalendarHeart,
-    description: "Plan your goals",
+    description: "Create a plan",
+  },
+  {
+    label: "My Plans",
+    href: "/nutrition/plans",
+    icon: LayoutDashboard,
+    description: "Your active plans",
   },
   {
     label: "Profile",
