@@ -2,6 +2,12 @@
 
 import { getNutritionLogsAction } from "@/actions/nutrition.action";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { format } from "date-fns";
 import {
   ArrowLeft,
@@ -28,12 +34,25 @@ interface NutritionLog {
   imageUrl?: string;
   createdAt: string;
   healthScore: number;
+  servingSize?: string;
+  fiber?: number;
+  sugar?: number;
+  sodium?: number;
+  cholesterol?: number;
+  vitaminA?: number;
+  vitaminC?: number;
+  vitaminB6?: number;
+  iron?: number;
+  potassium?: number;
+  calcium?: number;
+  tags?: string[];
 }
 
 export default function NutritionLogsPage() {
   const [logs, setLogs] = useState<NutritionLog[]>([]);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [selectedLog, setSelectedLog] = useState<NutritionLog | null>(null);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -140,10 +159,10 @@ export default function NutritionLogsPage() {
               <div
                 key={log.id}
                 ref={index === logs.length - 1 ? lastElementRef : null}
-                className="group rounded-2xl border border-border/50 bg-card overflow-hidden hover:shadow-lg hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300"
+                className="group rounded-2xl border border-border/50 bg-card overflow-hidden hover:shadow-lg hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300 flex flex-col"
               >
                 {/* Image Area */}
-                <div className="relative aspect-video bg-muted/20">
+                <div className="relative aspect-video bg-muted/20 overflow-hidden">
                   {log.imageUrl ? (
                     <img
                       src={log.imageUrl}
@@ -168,12 +187,12 @@ export default function NutritionLogsPage() {
                 </div>
 
                 {/* Info Area */}
-                <div className="p-4 space-y-4">
+                <div className="p-4 space-y-4 flex-1 flex flex-col">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-bold text-foreground leading-tight">{log.name}</h3>
+                    <h3 className="font-bold text-foreground leading-tight line-clamp-1">{log.name}</h3>
                     <div className="flex items-center gap-1 text-[10px] text-muted-foreground whitespace-nowrap">
                       <Clock className="w-3 h-3" />
-                      {format(new Date(log.createdAt), "MMM d, h:mm a")}
+                      {format(new Date(log.createdAt), "MMM d")}
                     </div>
                   </div>
 
@@ -190,6 +209,15 @@ export default function NutritionLogsPage() {
                         <p className="text-[8px] text-muted-foreground font-black uppercase tracking-tighter">{stat.label}</p>
                       </div>
                     ))}
+                  </div>
+
+                  <div className="pt-2 mt-auto">
+                    <button 
+                      onClick={() => setSelectedLog(log)}
+                      className="w-full py-2 rounded-xl bg-muted/50 hover:bg-primary hover:text-primary-foreground text-xs font-bold transition-all duration-300"
+                    >
+                      View Details
+                    </button>
                   </div>
                 </div>
               </div>
@@ -227,6 +255,122 @@ export default function NutritionLogsPage() {
           </Link>
         </div>
       )}
+
+      {/* Detail Modal (Using Shadcn Dialog) */}
+      <Dialog open={!!selectedLog} onOpenChange={(open) => !open && setSelectedLog(null)}>
+        <DialogContent className="sm:max-w-[700px] w-[95vw] p-0 overflow-hidden border-none bg-card rounded-[2rem] shadow-2xl">
+          {selectedLog && (
+            <div className="flex flex-col max-h-[90vh]">
+              {/* Modal Header */}
+              <div className="relative h-48 sm:h-64 bg-muted">
+                {selectedLog.imageUrl ? (
+                  <img 
+                    src={selectedLog.imageUrl} 
+                    alt={selectedLog.name} 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Flame className="w-12 h-12 text-muted-foreground/20" />
+                  </div>
+                )}
+                <div className="absolute bottom-4 left-4 right-4">
+                   <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-background/90 backdrop-blur-sm border border-border text-[10px] font-black uppercase tracking-widest text-primary shadow-lg">
+                      {selectedLog.mealType} • {format(new Date(selectedLog.createdAt), "MMMM d, yyyy")}
+                   </div>
+                </div>
+              </div>
+
+              {/* Modal Body */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <DialogHeader className="p-0 text-left">
+                      <DialogTitle className="text-2xl font-black tracking-tight text-foreground">{selectedLog.name}</DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-muted-foreground mt-1">Serving Size: {selectedLog.servingSize || "N/A"}</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-3xl font-black text-primary leading-none">{selectedLog.calories}</div>
+                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Total Calories</div>
+                  </div>
+                </div>
+
+                {/* Main Macros */}
+                <div className="grid grid-cols-3 gap-3">
+                   {[
+                     { label: "Protein", value: `${selectedLog.protein}g`, icon: Drumstick, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+                     { label: "Carbs", value: `${selectedLog.carbs}g`, icon: Wheat, color: "text-secondary", bg: "bg-secondary/10" },
+                     { label: "Fats", value: `${selectedLog.fats}g`, icon: Droplets, color: "text-accent", bg: "bg-accent/10" },
+                   ].map(macro => (
+                     <div key={macro.label} className={cn("p-4 rounded-2xl border border-border/50 flex flex-col items-center gap-2", macro.bg)}>
+                        <macro.icon className={cn("w-5 h-5", macro.color)} />
+                        <div className="text-lg font-black">{macro.value}</div>
+                        <div className="text-[10px] font-bold opacity-60 uppercase tracking-widest">{macro.label}</div>
+                     </div>
+                   ))}
+                </div>
+
+                {/* Health Score & Tags */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-muted-foreground/60">Health Analysis</h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold">Score:</span>
+                      <span className={cn(
+                        "px-2 py-0.5 rounded-lg text-xs font-black",
+                        selectedLog.healthScore >= 80 ? "bg-primary/20 text-primary" : selectedLog.healthScore >= 60 ? "bg-secondary/20 text-secondary" : "bg-destructive/20 text-destructive"
+                      )}>{selectedLog.healthScore}/100</span>
+                    </div>
+                  </div>
+                  {selectedLog.tags && selectedLog.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {selectedLog.tags.map(tag => (
+                        <span key={tag} className="px-3 py-1 rounded-lg bg-muted text-[10px] font-bold text-muted-foreground border border-border/50">
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Micronutrients */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-black uppercase tracking-widest text-muted-foreground/60">Nutritional Profile</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-4">
+                    {[
+                      { label: "Fiber", value: `${selectedLog.fiber || 0}g` },
+                      { label: "Sugar", value: `${selectedLog.sugar || 0}g` },
+                      { label: "Sodium", value: `${selectedLog.sodium || 0}mg` },
+                      { label: "Cholesterol", value: `${selectedLog.cholesterol || 0}mg` },
+                      { label: "Potassium", value: `${selectedLog.potassium || 0}mg` },
+                      { label: "Calcium", value: `${selectedLog.calcium || 0}mg` },
+                      { label: "Iron", value: `${selectedLog.iron || 0}mg` },
+                      { label: "Vitamin A", value: `${selectedLog.vitaminA || 0}mcg` },
+                      { label: "Vitamin C", value: `${selectedLog.vitaminC || 0}mg` },
+                    ].map(micro => (
+                      <div key={micro.label} className="flex justify-between items-center border-b border-border/30 pb-1">
+                        <span className="text-xs text-muted-foreground font-medium">{micro.label}</span>
+                        <span className="text-xs font-bold text-foreground">{micro.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-6 pt-0">
+                 <button 
+                  onClick={() => setSelectedLog(null)}
+                  className="w-full py-4 rounded-2xl bg-foreground text-background text-sm font-black hover:opacity-90 transition-all shadow-xl"
+                 >
+                   Close Analysis
+                 </button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
