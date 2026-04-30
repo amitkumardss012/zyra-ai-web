@@ -15,83 +15,21 @@ import {
   Plus,
   ArrowUpRight,
   Check,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import {
-  BarChart,
-  Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell,
-  ReferenceLine,
-  AreaChart,
-  Area,
 } from "recharts";
 import Link from "next/link";
-
-/* ─── Mock Data ─── */
-const DAILY_STATS = {
-  calories: { current: 1850, goal: 2200, unit: "kcal" },
-  protein: { current: 125, goal: 160, unit: "g" },
-  carbs: { current: 180, goal: 250, unit: "g" },
-  fats: { current: 55, goal: 70, unit: "g" },
-};
-
-const RECENT_MEALS = [
-  {
-    id: 1,
-    name: "Grilled Chicken Salad",
-    time: "12:30 PM",
-    calories: 420,
-    protein: 45,
-    emoji: "🥗",
-  },
-  {
-    id: 2,
-    name: "Protein Smoothie",
-    time: "10:00 AM",
-    calories: 280,
-    protein: 35,
-    emoji: "🥤",
-  },
-  {
-    id: 3,
-    name: "Oatmeal & Berries",
-    time: "8:00 AM",
-    calories: 350,
-    protein: 12,
-    emoji: "🥣",
-  },
-  {
-    id: 4,
-    name: "Greek Yogurt",
-    time: "3:00 PM",
-    calories: 150,
-    protein: 18,
-    emoji: "🍶",
-  },
-];
-
-const WEEKLY_DATA = [
-  { day: "Mon", calories: 2100, goal: 2200 },
-  { day: "Tue", calories: 1950, goal: 2200 },
-  { day: "Wed", calories: 2300, goal: 2200 },
-  { day: "Thu", calories: 2050, goal: 2200 },
-  { day: "Fri", calories: 1800, goal: 2200 },
-  { day: "Sat", calories: 2400, goal: 2200 },
-  { day: "Sun", calories: 1850, goal: 2200 },
-];
-
-const NUTRIENT_HIGHLIGHTS = [
-  { name: "Fiber", amount: "18g", target: "25g", color: "from-amber-400 to-orange-500" },
-  { name: "Vitamin C", amount: "72mg", target: "90mg", color: "from-yellow-400 to-amber-500" },
-  { name: "Iron", amount: "14mg", target: "18mg", color: "from-red-400 to-rose-500" },
-  { name: "Calcium", amount: "800mg", target: "1000mg", color: "from-blue-400 to-indigo-500" },
-];
+import { getDashboardDataAction } from "@/actions/nutrition.action";
 
 /* ─── Components ─── */
 
@@ -162,7 +100,7 @@ function MacroCard({
   icon: React.ComponentType<{ className?: string }>;
   gradient: string;
 }) {
-  const pct = Math.round((current / goal) * 100);
+  const pct = goal > 0 ? Math.round((current / goal) * 100) : 0;
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-border/50 bg-card p-4 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:border-primary/20">
       <div className="flex items-center justify-between mb-3">
@@ -217,9 +155,35 @@ function MacroCard({
 
 export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-  
-  const maxBar = Math.max(...WEEKLY_DATA.map((d) => d.calories));
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<any>(null);
+
+  useEffect(() => {
+    setMounted(true);
+    const fetchData = async () => {
+      try {
+        const dashboardData = await getDashboardDataAction();
+        setData(dashboardData);
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (!mounted || loading) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-primary animate-spin" />
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
+  const { dailyStats, weeklyData, recentMeals, nutrientHighlights, quickStats } = data;
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-8 max-w-[1400px] mx-auto space-y-6">
@@ -233,10 +197,13 @@ export default function DashboardPage() {
             Track your daily nutrition goals and progress
           </p>
         </div>
-        <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-200 active:scale-[0.97] w-fit">
+        <Link 
+          href="/nutrition/scanner"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-200 active:scale-[0.97] w-fit"
+        >
           <Plus className="w-4 h-4" />
           Log Meal
-        </button>
+        </Link>
       </div>
 
       {/* ─── Main Calorie Ring + Macros ─── */}
@@ -244,8 +211,8 @@ export default function DashboardPage() {
         {/* Calorie Ring */}
         <div className="lg:col-span-4 rounded-2xl border border-border/50 bg-card p-6 flex flex-col items-center justify-center">
           <CircularProgress
-            current={DAILY_STATS.calories.current}
-            goal={DAILY_STATS.calories.goal}
+            current={dailyStats.calories.current}
+            goal={dailyStats.calories.goal}
             size={180}
             strokeWidth={14}
             color="url(#calorieGradient)"
@@ -267,20 +234,22 @@ export default function DashboardPage() {
             <div className="flex flex-col items-center">
               <Flame className="w-5 h-5 text-primary mb-1" />
               <span className="text-3xl font-bold tracking-tight text-foreground">
-                {DAILY_STATS.calories.current}
+                {dailyStats.calories.current}
               </span>
               <span className="text-[11px] text-muted-foreground font-medium">
-                / {DAILY_STATS.calories.goal} kcal
+                / {dailyStats.calories.goal} kcal
               </span>
             </div>
           </CircularProgress>
           <div className="mt-4 text-center">
             <p className="text-sm font-semibold text-foreground">
-              {DAILY_STATS.calories.goal - DAILY_STATS.calories.current} kcal
+              {Math.max(0, dailyStats.calories.goal - dailyStats.calories.current)} kcal
               remaining
             </p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              You&apos;re on track for today! 💪
+              {dailyStats.calories.current >= dailyStats.calories.goal 
+                ? "Calorie goal reached! 🎯" 
+                : "You're on track for today! 💪"}
             </p>
           </div>
         </div>
@@ -289,24 +258,24 @@ export default function DashboardPage() {
         <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
           <MacroCard
             label="Protein"
-            current={DAILY_STATS.protein.current}
-            goal={DAILY_STATS.protein.goal}
+            current={dailyStats.protein.current}
+            goal={dailyStats.protein.goal}
             unit="g"
             icon={Drumstick}
             gradient="from-primary to-primary/70"
           />
           <MacroCard
             label="Carbs"
-            current={DAILY_STATS.carbs.current}
-            goal={DAILY_STATS.carbs.goal}
+            current={dailyStats.carbs.current}
+            goal={dailyStats.carbs.goal}
             unit="g"
             icon={Wheat}
             gradient="from-secondary to-secondary/70"
           />
           <MacroCard
             label="Fats"
-            current={DAILY_STATS.fats.current}
-            goal={DAILY_STATS.fats.goal}
+            current={dailyStats.fats.current}
+            goal={dailyStats.fats.goal}
             unit="g"
             icon={Droplets}
             gradient="from-accent to-accent/70"
@@ -324,10 +293,10 @@ export default function DashboardPage() {
               </button>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {NUTRIENT_HIGHLIGHTS.map((n) => {
+              {nutrientHighlights.map((n: any) => {
                 const current = parseFloat(n.amount);
                 const target = parseFloat(n.target);
-                const pct = Math.round((current / target) * 100);
+                const pct = target > 0 ? Math.round((current / target) * 100) : 0;
                 return (
                   <div
                     key={n.name}
@@ -390,82 +359,78 @@ export default function DashboardPage() {
           </div>
           
           <div className="h-52 w-full mt-4 min-h-[200px]">
-            {mounted ? (
-              <ResponsiveContainer width="100%" height={200}>
-                <AreaChart data={WEEKLY_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorCalories" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid 
-                    strokeDasharray="8 8" 
-                    vertical={false} 
-                    stroke="var(--border)" 
-                    strokeOpacity={0.2}
-                  />
-                  <XAxis 
-                    dataKey="day" 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: 800 }}
-                    dy={15}
-                  />
-                  <YAxis 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: 800 }}
-                  />
-                  <Tooltip 
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        return (
-                          <div className="bg-card/80 backdrop-blur-xl border border-border/50 p-4 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-2">{payload[0].payload.day}</p>
-                            <div className="flex items-baseline gap-2">
-                              <span className="text-2xl font-black text-foreground tracking-tighter">
-                                {payload[0].value}
-                              </span>
-                              <span className="text-[10px] font-bold text-muted-foreground uppercase">kcal</span>
-                            </div>
-                            <div className="mt-3 flex items-center gap-2 text-[10px] font-bold py-1 px-2 rounded-lg bg-primary/10 text-primary w-fit">
-                              <Check className="w-3 h-3" />
-                              Goal: {payload[0].payload.goal}
-                            </div>
+            <ResponsiveContainer width="100%" height={200}>
+              <AreaChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorCalories" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid 
+                  strokeDasharray="8 8" 
+                  vertical={false} 
+                  stroke="var(--border)" 
+                  strokeOpacity={0.2}
+                />
+                <XAxis 
+                  dataKey="day" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: 800 }}
+                  dy={15}
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: 800 }}
+                />
+                <Tooltip 
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="bg-card/80 backdrop-blur-xl border border-border/50 p-4 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-2">{payload[0].payload.day}</p>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-black text-foreground tracking-tighter">
+                              {payload[0].value}
+                            </span>
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase">kcal</span>
                           </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="calories" 
-                    stroke="var(--primary)" 
-                    strokeWidth={4}
-                    fillOpacity={1} 
-                    fill="url(#colorCalories)" 
-                    animationDuration={2000}
-                    dot={{ 
-                      r: 4, 
-                      fill: "var(--background)", 
-                      stroke: "var(--primary)", 
-                      strokeWidth: 2,
-                      strokeOpacity: 1
-                    }}
-                    activeDot={{ 
-                      r: 6, 
-                      fill: "var(--primary)", 
-                      stroke: "var(--background)", 
-                      strokeWidth: 2,
-                    }}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="w-full h-full bg-muted/10 animate-pulse rounded-2xl" />
-            )}
+                          <div className="mt-3 flex items-center gap-2 text-[10px] font-bold py-1 px-2 rounded-lg bg-primary/10 text-primary w-fit">
+                            <Check className="w-3 h-3" />
+                            Goal: {payload[0].payload.goal}
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="calories" 
+                  stroke="var(--primary)" 
+                  strokeWidth={4}
+                  fillOpacity={1} 
+                  fill="url(#colorCalories)" 
+                  animationDuration={2000}
+                  dot={{ 
+                    r: 4, 
+                    fill: "var(--background)", 
+                    stroke: "var(--primary)", 
+                    strokeWidth: 2,
+                    strokeOpacity: 1
+                  }}
+                  activeDot={{ 
+                    r: 6, 
+                    fill: "var(--primary)", 
+                    stroke: "var(--background)", 
+                    strokeWidth: 2,
+                  }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
@@ -484,7 +449,7 @@ export default function DashboardPage() {
             </Link>
           </div>
           <div className="space-y-2">
-            {RECENT_MEALS.map((meal) => (
+            {recentMeals.map((meal: any) => (
               <div
                 key={meal.id}
                 className="group flex items-center gap-3 p-3 rounded-xl hover:bg-muted/40 transition-all duration-200 cursor-pointer"
@@ -512,78 +477,57 @@ export default function DashboardPage() {
                 <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary transition-colors" />
               </div>
             ))}
+            {recentMeals.length === 0 && (
+              <div className="py-8 text-center text-muted-foreground text-xs italic">
+                No meals logged recently
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* ─── Quick Stats ─── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          {
-            label: "Avg Daily Protein",
-            value: "138g",
-            change: "+12%",
-            trend: "up",
-            icon: TrendingUp,
-          },
-          {
-            label: "Meals Logged",
-            value: "28",
-            change: "This week",
-            trend: "neutral",
-            icon: Target,
-          },
-          {
-            label: "Best Streak",
-            value: "14 days",
-            change: "Current",
-            trend: "up",
-            icon: Flame,
-          },
-          {
-            label: "Calorie Deficit",
-            value: "-350",
-            change: "kcal/day",
-            trend: "down",
-            icon: TrendingDown,
-          },
-        ].map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-2xl border border-border/50 bg-card p-4 hover:shadow-md hover:border-primary/10 transition-all duration-200"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <stat.icon
-                className={cn(
-                  "w-4 h-4",
-                  stat.trend === "up"
-                    ? "text-primary"
-                    : stat.trend === "down"
-                    ? "text-secondary"
-                    : "text-muted-foreground"
-                )}
-              />
-              <span
-                className={cn(
-                  "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
-                  stat.trend === "up"
-                    ? "bg-primary/10 text-primary"
-                    : stat.trend === "down"
-                    ? "bg-secondary/10 text-secondary"
-                    : "bg-muted text-muted-foreground"
-                )}
-              >
-                {stat.change}
-              </span>
+        {quickStats.map((stat: any) => {
+          const Icon = stat.label.includes("Protein") ? TrendingUp : stat.label.includes("Logged") ? Target : stat.label.includes("Streak") ? Flame : TrendingDown;
+          return (
+            <div
+              key={stat.label}
+              className="rounded-2xl border border-border/50 bg-card p-4 hover:shadow-md hover:border-primary/10 transition-all duration-200"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <Icon
+                  className={cn(
+                    "w-4 h-4",
+                    stat.trend === "up"
+                      ? "text-primary"
+                      : stat.trend === "down"
+                      ? "text-secondary"
+                      : "text-muted-foreground"
+                  )}
+                />
+                <span
+                  className={cn(
+                    "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
+                    stat.trend === "up"
+                      ? "bg-primary/10 text-primary"
+                      : stat.trend === "down"
+                      ? "bg-secondary/10 text-secondary"
+                      : "bg-muted text-muted-foreground"
+                  )}
+                >
+                  {stat.change}
+                </span>
+              </div>
+              <p className="text-xl font-bold tracking-tight text-foreground">
+                {stat.value}
+              </p>
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mt-0.5">
+                {stat.label}
+              </p>
             </div>
-            <p className="text-xl font-bold tracking-tight text-foreground">
-              {stat.value}
-            </p>
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mt-0.5">
-              {stat.label}
-            </p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

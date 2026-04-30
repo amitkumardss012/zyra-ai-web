@@ -53,3 +53,12 @@ export const getPlansAction = async (params?: {
     throw error;
   }
 };
+export const getDashboardDataAction = async () => {
+  try {
+    const res = await apiClient.get("/nutrition/dashboard");
+    return res.data.data;
+  } catch (error) {
+    console.error("Error in getDashboardDataAction:", error);
+    throw error;
+  }
+};
