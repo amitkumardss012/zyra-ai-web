@@ -239,7 +239,7 @@ export function NutritionShell({ children }: { children: React.ReactNode }) {
       {/* ─── Mobile Bottom Tab Bar ─── */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-xl border-t border-border/50 safe-bottom">
         <div className="flex items-center justify-around px-2 h-16">
-          {NAV_ITEMS.map((item) => {
+          {NAV_ITEMS.filter(item => item.label !== "History" && item.label !== "My Plans").map((item) => {
             const isActive =
               pathname === item.href || pathname?.startsWith(item.href + "/");
             return (
