@@ -267,22 +267,22 @@ export default function ScannerPage() {
                   className="w-full h-full object-cover"
                 />
                   <div className="absolute top-3 left-3 flex flex-col gap-1">
-                    {originalSize && (
+                    {/* {originalSize && (
                       <div className="px-2 py-1 rounded-md bg-destructive/10 backdrop-blur-sm border border-destructive/20 flex items-center gap-1.5 shadow-xs">
                         <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
                         <span className="text-[10px] font-bold text-destructive whitespace-nowrap">
                           Original: {originalSize}
                         </span>
                       </div>
-                    )}
-                    {fileSize && (
+                    )} */}
+                    {/* {fileSize && (
                       <div className="px-2 py-1 rounded-md bg-background/60 backdrop-blur-sm border border-border/40 flex items-center gap-1.5 shadow-xs">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                         <span className="text-[10px] font-bold text-foreground whitespace-nowrap">
-                          Optimized: {fileSize}
+                          size: {fileSize}
                         </span>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 {isScanning && (
                   <div className="absolute inset-0 bg-background/60 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
