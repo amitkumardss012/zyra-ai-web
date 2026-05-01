@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useScan } from "@/providers/scan-provider";
+import imageCompression from "browser-image-compression";
 
 /* ─── Types ─── */
 interface NutrientResult {
@@ -89,14 +90,34 @@ export default function ScannerPage() {
     }
   }, [lastResult]);
 
-  const handleFile = useCallback((file: File) => {
+  const handleFile = useCallback(async (file: File) => {
     if (!file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setPreview(e.target?.result as string);
-      resetScan();
+
+    // Compression options to reduce size under 100KB
+    const options = {
+      maxSizeMB: 0.1, // 0.1MB = 100KB
+      maxWidthOrHeight: 1280,
+      useWebWorker: true,
     };
-    reader.readAsDataURL(file);
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreview(e.target?.result as string);
+        resetScan();
+      };
+      reader.readAsDataURL(compressedFile);
+    } catch (error) {
+      console.error("Image compression error:", error);
+      // Fallback to original file if compression fails
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreview(e.target?.result as string);
+        resetScan();
+      };
+      reader.readAsDataURL(file);
+    }
   }, [resetScan]);
 
   const handleDrop = useCallback(
