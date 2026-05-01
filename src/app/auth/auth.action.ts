@@ -2,7 +2,6 @@ import { apiClient } from "@/api/api-client";
 import { showError, showSuccess } from "@/utils/message";
 import { redirect } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { updateTag } from "next/cache";
 
 export const authAction = async (payload: { name: string; email: string; avatar: string }) => {
   let redirectTo: string | null = null;
@@ -10,6 +9,9 @@ export const authAction = async (payload: { name: string; email: string; avatar:
     const res = await apiClient.post("/user/auth", payload);
     if (res.data.success) {
       const user = res.data.data;
+      if (user.token) {
+        localStorage.setItem("token", user.token);
+      }
       if (user.isProfileCompleted) {
         redirectTo = `/${user.preferredMode.toLowerCase()}/dashboard`;
       } else {
