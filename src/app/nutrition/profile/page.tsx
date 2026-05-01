@@ -1,14 +1,13 @@
 import { getCurrentUser } from "@/actions/user.action";
 import { useAuth } from "@/hooks/useAuth";
 import { useToken } from "@/hooks/useToken";
-import { cn } from "@/lib/utils";
 import {
-  ChevronRight,
-  Sparkles,
-  RefreshCcw,
   CalendarHeart,
-  User,
+  ChevronRight,
   Lock,
+  RefreshCcw,
+  Sparkles,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -20,27 +19,27 @@ export default async function ProfilePage() {
     redirect("/auth");
   }
 
-  const token = await useToken();
-  const user = await getCurrentUser(token);
+  // const token = await useToken();
+  // const user = await getCurrentUser(token);
 
-  if (!user || !user.isProfileCompleted) {
-    redirect("/complete-onboarding");
-  }
+  // if (!user || !user.isProfileCompleted) {
+  //   redirect("/complete-onboarding");
+  // }
 
   return (
     <div className="min-h-full flex flex-col justify-center py-8 md:py-0 px-6 max-w-[500px] mx-auto space-y-10 md:space-y-12">
       {/* ─── Ultra Minimal Header ─── */}
       <div className="flex flex-col items-center text-center space-y-4">
         <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center overflow-hidden border border-border">
-          {user.avatar ? (
-            <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+          {session?.user?.picture ? (
+            <img src={session.user.picture} alt={session.user.name || "Profile"} className="w-full h-full object-cover" />
           ) : (
             <User className="w-8 h-8 text-muted-foreground/40" />
           )}
         </div>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">{user.name}</h1>
-          <p className="text-sm text-muted-foreground">{user.email}</p>
+          <h1 className="text-2xl font-bold tracking-tight">{session?.user?.name}</h1>
+          <p className="text-sm text-muted-foreground">{session?.user?.email}</p>
         </div>
       </div>
 
