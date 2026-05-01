@@ -54,12 +54,15 @@ export default function ScannerPage() {
   const [preview, setPreview] = useState<string | null>(lastImage);
   const [showDetails, setShowDetails] = useState(false);
   const [mappedResult, setMappedResult] = useState<FoodResult | null>(null);
+  const [fileSize, setFileSize] = useState<string | null>(null);
+  const [originalSize, setOriginalSize] = useState<string | null>(null);
+  const [isCompressing, setIsCompressing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync global result with local display mapping and preview
   useEffect(() => {
     if (lastImage) setPreview(lastImage);
-    
+
     if (lastResult) {
       const data = lastResult as any;
       const mapped: FoodResult = {
@@ -92,6 +95,8 @@ export default function ScannerPage() {
 
   const handleFile = useCallback(async (file: File) => {
     if (!file.type.startsWith("image/")) return;
+    setIsCompressing(true);
+    setOriginalSize(`${(file.size / 1024).toFixed(1)} KB`);
 
     // Compression options to reduce size under 100KB
     const options = {
@@ -102,6 +107,10 @@ export default function ScannerPage() {
 
     try {
       const compressedFile = await imageCompression(file, options);
+      const sizeInKb = (compressedFile.size / 1024).toFixed(1);
+      setFileSize(`${sizeInKb} KB`);
+      console.log("Original file size:", file.size / 1024, "KB");
+      console.log("Compressed file size:", compressedFile.size / 1024, "KB");
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreview(e.target?.result as string);
@@ -111,12 +120,16 @@ export default function ScannerPage() {
     } catch (error) {
       console.error("Image compression error:", error);
       // Fallback to original file if compression fails
+      const sizeInKb = (file.size / 1024).toFixed(1);
+      setFileSize(`${sizeInKb} KB`);
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreview(e.target?.result as string);
         resetScan();
       };
       reader.readAsDataURL(file);
+    } finally {
+      setIsCompressing(false);
     }
   }, [resetScan]);
 
@@ -137,6 +150,8 @@ export default function ScannerPage() {
 
   const handleReset = () => {
     setPreview(null);
+    setFileSize(null);
+    setOriginalSize(null);
     resetScan();
     setShowDetails(false);
   };
@@ -190,32 +205,50 @@ export default function ScannerPage() {
                 }}
               />
               <div className="flex flex-col items-center gap-4">
-                <div className="relative">
-                  <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-primary/10 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <ImagePlus className="w-8 h-8 text-primary/60 group-hover:text-primary transition-colors duration-300" />
+                {isCompressing ? (
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-20 h-20 rounded-2xl bg-primary/5 flex items-center justify-center">
+                      <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-semibold text-foreground">
+                        Optimizing...
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">
+                        Reducing file size
+                      </p>
+                    </div>
                   </div>
-                  <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
-                    <Sparkles className="w-3 h-3 text-primary-foreground" />
-                  </div>
-                </div>
-                <div className="text-center space-y-1">
-                  <p className="text-sm font-semibold text-foreground">
-                    Drop your food photo here
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    or click to browse • PNG, JPG, WEBP supported
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 mt-2">
-                  <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/15 transition-colors">
-                    <Upload className="w-3.5 h-3.5" />
-                    Upload
-                  </button>
-                  <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-muted text-muted-foreground text-xs font-semibold hover:bg-muted/80 transition-colors">
-                    <Camera className="w-3.5 h-3.5" />
-                    Camera
-                  </button>
-                </div>
+                ) : (
+                  <>
+                    <div className="relative">
+                      <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-primary/10 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <ImagePlus className="w-8 h-8 text-primary/60 group-hover:text-primary transition-colors duration-300" />
+                      </div>
+                      <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
+                        <Sparkles className="w-3 h-3 text-primary-foreground" />
+                      </div>
+                    </div>
+                    <div className="text-center space-y-1">
+                      <p className="text-sm font-semibold text-foreground">
+                        Drop your food photo here
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        or click to browse • PNG, JPG, WEBP supported
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/15 transition-colors">
+                        <Upload className="w-3.5 h-3.5" />
+                        Upload
+                      </button>
+                      <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-muted text-muted-foreground text-xs font-semibold hover:bg-muted/80 transition-colors">
+                        <Camera className="w-3.5 h-3.5" />
+                        Camera
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Decorative corner marks */}
@@ -233,6 +266,24 @@ export default function ScannerPage() {
                   alt="Food preview"
                   className="w-full h-full object-cover"
                 />
+                  <div className="absolute top-3 left-3 flex flex-col gap-1">
+                    {originalSize && (
+                      <div className="px-2 py-1 rounded-md bg-destructive/10 backdrop-blur-sm border border-destructive/20 flex items-center gap-1.5 shadow-xs">
+                        <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                        <span className="text-[10px] font-bold text-destructive whitespace-nowrap">
+                          Original: {originalSize}
+                        </span>
+                      </div>
+                    )}
+                    {fileSize && (
+                      <div className="px-2 py-1 rounded-md bg-background/60 backdrop-blur-sm border border-border/40 flex items-center gap-1.5 shadow-xs">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        <span className="text-[10px] font-bold text-foreground whitespace-nowrap">
+                          Optimized: {fileSize}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 {isScanning && (
                   <div className="absolute inset-0 bg-background/60 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
                     <div className="relative">
@@ -326,8 +377,8 @@ export default function ScannerPage() {
                         mappedResult.healthScore >= 80
                           ? "bg-primary/10 text-primary"
                           : mappedResult.healthScore >= 60
-                          ? "bg-secondary/10 text-secondary"
-                          : "bg-destructive/10 text-destructive"
+                            ? "bg-secondary/10 text-secondary"
+                            : "bg-destructive/10 text-destructive"
                       )}
                     >
                       {mappedResult.healthScore}
