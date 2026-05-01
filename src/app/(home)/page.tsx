@@ -2,6 +2,7 @@ import { getCurrentUser } from "@/actions/user.action";
 import { useAuth } from "@/hooks/useAuth";
 import { useToken } from "@/hooks/useToken";
 import { redirect } from "next/navigation";
+import { signOut } from "../../../auth";
 
 export default async function DashboardPage() {
   const session = await useAuth();
@@ -15,8 +16,8 @@ export default async function DashboardPage() {
   console.log({user})
 
   if (!user || !user.isProfileCompleted) {
-    redirect("/complete-onboarding");
+    redirect("/nutrition/dashboard");
   }
 
-  redirect(`/${user.preferredMode.toLowerCase()}/dashboard`);
+  redirect(`/${user?.preferredMode.toLowerCase()}/dashboard`);
 }
