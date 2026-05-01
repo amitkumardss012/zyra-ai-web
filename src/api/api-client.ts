@@ -4,8 +4,8 @@ import { signOut } from "../../auth";
 export const apiClient = axios.create({
     // baseURL: "https://zyra.mintafresh.com/api/v1",
     // baseURL: "http://168.231.123.247:7000/api/v1",
-    // baseURL: "http://localhost:4000/api/v1",
-    baseURL: "https://zyra.mintafresh.com/api/v1",
+    baseURL: "http://localhost:4000/api/v1",
+    // baseURL: "https://zyra.mintafresh.com/api/v1",
     headers: {
         "Content-Type": "application/json",
     },
