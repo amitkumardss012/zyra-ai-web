@@ -424,7 +424,7 @@ export default function PlansPage() {
                            {/* Meals Grid */}
                            <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/8">
                               {/* Breakfast */}
-                              <div className="p-8 space-y-4 hover:bg-primary/[0.02] transition-colors">
+                              <div className="p-8 space-y-4 hover:bg-primary/2 transition-colors">
                                  <div className="flex items-center gap-3 text-[10px] font-black text-primary uppercase tracking-[0.2em]">
                                     <div className="p-2 rounded-xl bg-primary/10">
                                        <Coffee className="w-3.5 h-3.5" />
@@ -437,7 +437,7 @@ export default function PlansPage() {
                               </div>
 
                               {/* Lunch */}
-                              <div className="p-8 space-y-4 hover:bg-primary/[0.02] transition-colors">
+                              <div className="p-8 space-y-4 hover:bg-primary/2 transition-colors">
                                  <div className="flex items-center gap-3 text-[10px] font-black text-primary uppercase tracking-[0.2em]">
                                     <div className="p-2 rounded-xl bg-primary/10">
                                        <UtensilsCrossed className="w-3.5 h-3.5" />
@@ -450,7 +450,7 @@ export default function PlansPage() {
                               </div>
 
                               {/* Dinner */}
-                              <div className="p-8 space-y-4 hover:bg-primary/[0.02] transition-colors">
+                              <div className="p-8 space-y-4 hover:bg-primary/2 transition-colors">
                                  <div className="flex items-center gap-3 text-[10px] font-black text-primary uppercase tracking-[0.2em]">
                                     <div className="p-2 rounded-xl bg-primary/10">
                                        <Moon className="w-3.5 h-3.5" />

@@ -438,7 +438,7 @@ export default function PlannerPage() {
 
           {/* AI Strategic Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-6 rounded-[2rem] bg-emerald-500/[0.03] border border-emerald-500/10">
+            <div className="p-6 rounded-[2rem] bg-emerald-500/3 border border-emerald-500/10">
               <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-4 flex items-center gap-2">
                 <Check className="w-3.5 h-3.5" /> Recommended Foods
               </h4>
@@ -450,7 +450,7 @@ export default function PlannerPage() {
                 ))}
               </div>
             </div>
-            <div className="p-6 rounded-[2rem] bg-rose-500/[0.03] border border-rose-500/10">
+            <div className="p-6 rounded-[2rem] bg-rose-500/3 border border-rose-500/10">
               <h4 className="text-[10px] font-black uppercase tracking-widest text-rose-600 mb-4 flex items-center gap-2">
                 <AlertCircle className="w-3.5 h-3.5" /> Avoid
               </h4>
@@ -464,7 +464,7 @@ export default function PlannerPage() {
             </div>
           </div>
 
-          <div className="p-6 rounded-[2rem] bg-linear-to-br from-primary/[0.03] to-transparent border border-primary/10">
+          <div className="p-6 rounded-[2rem] bg-linear-to-br from-primary/3 to-transparent border border-primary/10">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4 flex items-center gap-2">
               <Sparkles className="w-3.5 h-3.5" /> AI Expert Strategy
             </h4>
