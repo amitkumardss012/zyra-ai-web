@@ -76,13 +76,29 @@ export default function ChatPage() {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    // Update UI immediately with the user message
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
     setInput("");
     setIsTyping(true);
 
     try {
+      // Implement context windowing: first 5 and last 5 messages
+      // This prevents token limit issues and maintains focus for the LLM
+      let messagesToHighlight = updatedMessages;
+      if (updatedMessages.length > 10) {
+        const firstFive = updatedMessages.slice(0, 5);
+        const lastFive = updatedMessages.slice(-5);
+        messagesToHighlight = [...firstFive, ...lastFive];
+      }
+
+      const chatHistory = messagesToHighlight.map(({ role, content }) => ({
+        role,
+        content,
+      }));
+
       const response = await apiClient.post("/nutrition/chat", {
-        messages: content,
+        messages: chatHistory,
       });
 
       const assistantMsg: Message = {
@@ -275,6 +291,38 @@ export default function ChatPage() {
                           blockquote: ({ ...props }) => (
                             <blockquote
                               className="border-l-2 border-primary/20 pl-4 my-2 italic text-muted-foreground"
+                              {...props}
+                            />
+                          ),
+                          table: ({ ...props }) => (
+                            <div className="my-4 overflow-x-auto rounded-xl border border-border/50 bg-card/50">
+                              <table
+                                className="w-full text-xs text-left border-collapse"
+                                {...props}
+                              />
+                            </div>
+                          ),
+                          thead: ({ ...props }) => (
+                            <thead
+                              className="bg-muted/50 text-foreground font-bold"
+                              {...props}
+                            />
+                          ),
+                          th: ({ ...props }) => (
+                            <th
+                              className="px-4 py-2.5 border-b border-border/50 font-bold text-primary"
+                              {...props}
+                            />
+                          ),
+                          td: ({ ...props }) => (
+                            <td
+                              className="px-4 py-2 border-b border-border/50 last:border-0 text-muted-foreground"
+                              {...props}
+                            />
+                          ),
+                          tr: ({ ...props }) => (
+                            <tr
+                              className="hover:bg-muted/20 transition-colors duration-200"
                               {...props}
                             />
                           ),

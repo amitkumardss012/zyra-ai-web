@@ -4,20 +4,25 @@ import { apiClient } from "@/api/api-client";
 import { AILoader } from "@/components/ui/ai-loader";
 import { cn } from "@/lib/utils";
 import {
+  Activity,
+  AlertCircle,
   ArrowRight,
   CalendarHeart,
   Check,
   ChevronRight,
   Clock,
+  Coffee,
   Dumbbell,
   Flame,
   HelpCircle,
   MessageSquare,
+  Moon,
   Sparkles,
   Target,
   TrendingDown,
   TrendingUp,
   Utensils,
+  UtensilsCrossed,
   Zap
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -59,22 +64,19 @@ interface TransformationPlan {
   fatsGrams: number;
   durationDays: number;
   dietSchedule: {
-    mealName: string;
-    time: string;
-    items: string[];
-    calories: number;
+    day: string;
+    breakfast: string;
+    lunch: string;
+    dinner: string;
   }[];
   workoutRoutine: {
     day: string;
-    focus: string;
     exercises: {
       name: string;
-      sets: number;
-      reps: string;
-      notes?: string;
+      duration: string;
     }[];
   }[];
-  guidelines: {
+  guidelines?: {
     toEat: string[];
     toAvoid: string[];
     tips: string[];
@@ -434,36 +436,91 @@ export default function PlannerPage() {
             </div>
           </div>
 
-          {/* Detailed Diet Schedule */}
+          {/* AI Strategic Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-6 rounded-[2rem] bg-emerald-500/[0.03] border border-emerald-500/10">
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-4 flex items-center gap-2">
+                <Check className="w-3.5 h-3.5" /> Recommended Foods
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {plan.guidelines?.toEat?.map((item, i) => (
+                  <span key={i} className="px-2.5 py-1 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-[10px] font-bold text-emerald-700">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="p-6 rounded-[2rem] bg-rose-500/[0.03] border border-rose-500/10">
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-rose-600 mb-4 flex items-center gap-2">
+                <AlertCircle className="w-3.5 h-3.5" /> Avoid
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {plan.guidelines?.toAvoid?.map((item, i) => (
+                  <span key={i} className="px-2.5 py-1 rounded-lg bg-rose-500/5 border border-rose-500/10 text-[10px] font-bold text-rose-700">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-[2rem] bg-linear-to-br from-primary/[0.03] to-transparent border border-primary/10">
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4 flex items-center gap-2">
+              <Sparkles className="w-3.5 h-3.5" /> AI Expert Strategy
+            </h4>
+            <div className="space-y-2">
+              {plan.guidelines?.tips?.map((tip, i) => (
+                <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed">
+                  <div className="w-1 h-1 rounded-full bg-primary/40 mt-1.5 shrink-0" />
+                  {tip}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Strategic Nutrition Cards */}
           <div className="space-y-4">
             <h3 className="text-base font-bold text-foreground flex items-center gap-2">
               <Utensils className="w-4 h-4 text-primary" />
-              Strategic Nutrition Schedule
+              Strategic Nutrition Schedule (7 Days)
             </h3>
-            <div className="space-y-3">
-              {plan.dietSchedule.map((meal, i) => (
-                <div key={i} className="group flex gap-4 p-4 rounded-2xl bg-card border border-border/50 hover:border-primary/20 transition-all">
-                  <div className="flex flex-col items-center shrink-0">
-                    <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center">
-                      <Clock className="w-5 h-5 text-muted-foreground" />
+            <div className="space-y-4">
+              {plan.dietSchedule?.map((row, i) => (
+                <div key={i} className="group rounded-[2rem] bg-card border border-border/50 overflow-hidden hover:border-primary/20 transition-all duration-300">
+                  {/* Day Header */}
+                  <div className="bg-muted/30 px-6 py-3 border-b border-border/50 flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">{row.day}</span>
+                    <div className="flex gap-1.5">
+                      {[1, 2, 3].map(dot => (
+                        <div key={dot} className="w-1 h-1 rounded-full bg-muted-foreground/20" />
+                      ))}
                     </div>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-bold text-foreground">{meal.mealName}</p>
-                        <p className="text-[10px] text-muted-foreground font-medium">{meal.time}</p>
+                  
+                  {/* Meals Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border/50">
+                    {/* Breakfast */}
+                    <div className="p-6 space-y-3">
+                      <div className="flex items-center gap-2 text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+                        <Coffee className="w-3 h-3 text-primary/60" /> Breakfast
                       </div>
-                      <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-lg">
-                        {meal.calories} kcal
-                      </span>
+                      <p className="text-xs font-medium text-foreground/80 leading-relaxed">{row.breakfast}</p>
                     </div>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {meal.items.map((item, j) => (
-                        <span key={j} className="text-[10px] font-medium bg-muted/50 px-2.5 py-1 rounded-md text-muted-foreground border border-border/30">
-                          {item}
-                        </span>
-                      ))}
+
+                    {/* Lunch */}
+                    <div className="p-6 space-y-3">
+                      <div className="flex items-center gap-2 text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+                        <UtensilsCrossed className="w-3 h-3 text-primary/60" /> Lunch
+                      </div>
+                      <p className="text-xs font-medium text-foreground/80 leading-relaxed">{row.lunch}</p>
+                    </div>
+
+                    {/* Dinner */}
+                    <div className="p-6 space-y-3">
+                      <div className="flex items-center gap-2 text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+                        <Moon className="w-3 h-3 text-primary/60" /> Dinner
+                      </div>
+                      <p className="text-xs font-medium text-foreground/80 leading-relaxed">{row.dinner}</p>
                     </div>
                   </div>
                 </div>
@@ -471,31 +528,32 @@ export default function PlannerPage() {
             </div>
           </div>
 
-          {/* Workout Routine */}
+          {/* Training Protocol Cards */}
           <div className="space-y-4">
             <h3 className="text-base font-bold text-foreground flex items-center gap-2">
               <Dumbbell className="w-4 h-4 text-secondary" />
-              Training Split & Protocol
+              Training Protocol (7 Days)
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {plan.workoutRoutine.map((routine, i) => (
-                <div key={i} className="p-5 rounded-2xl border border-border/50 bg-card hover:shadow-md transition-all">
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-sm font-bold text-foreground">{routine.day}</p>
-                    <span className="text-[10px] font-bold text-secondary bg-secondary/10 px-2 py-1 rounded-md">
-                      {routine.focus}
-                    </span>
+            <div className="grid grid-cols-1 gap-4">
+              {plan.workoutRoutine?.map((day, i) => (
+                <div key={i} className="group p-6 rounded-[2rem] bg-card border border-border/50 hover:border-secondary/20 transition-all duration-300">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Dumbbell className="w-5 h-5 text-secondary" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-black text-foreground">{day.day}</h4>
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Day {i + 1}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-3">
-                    {routine.exercises.map((ex, j) => (
-                      <div key={j} className="flex items-start justify-between gap-4 p-2.5 rounded-lg bg-muted/20 border border-border/10">
-                        <div className="space-y-0.5">
-                          <p className="text-xs font-bold text-foreground">{ex.name}</p>
-                          {ex.notes && <p className="text-[9px] text-muted-foreground">{ex.notes}</p>}
-                        </div>
-                        <div className="text-right shrink-0">
-                          <p className="text-[10px] font-bold text-primary">{ex.sets} × {ex.reps}</p>
-                        </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {day.exercises?.map((ex, j) => (
+                      <div key={j} className="flex items-center justify-between p-4 rounded-xl bg-muted/20 border border-border/10 hover:bg-muted/30 transition-colors">
+                        <span className="text-xs font-bold text-foreground/80">{ex.name}</span>
+                        <span className="text-[10px] font-black text-secondary">{ex.duration}</span>
                       </div>
                     ))}
                   </div>
@@ -504,50 +562,15 @@ export default function PlannerPage() {
             </div>
           </div>
 
-          {/* Scientific Guidelines */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-             <div className="p-5 rounded-2xl border border-border/50 bg-green-500/5 space-y-3">
-               <h4 className="text-xs font-bold text-green-600 uppercase flex items-center gap-2">
-                 <Check className="w-3.5 h-3.5" />
-                 Prioritize
-               </h4>
-               <ul className="space-y-1.5">
-                 {plan.guidelines.toEat.map((item, i) => (
-                   <li key={i} className="text-[11px] text-muted-foreground flex items-center gap-2">
-                     <div className="w-1 h-1 rounded-full bg-green-500/40" />
-                     {item}
-                   </li>
-                 ))}
-               </ul>
+          {/* Scientific Guidelines - Simplified */}
+          <div className="p-8 rounded-[2.5rem] bg-linear-to-br from-primary/5 to-transparent border border-primary/10">
+             <div className="flex items-center gap-3 mb-4">
+               <Sparkles className="w-5 h-5 text-primary" />
+               <h4 className="text-sm font-black uppercase tracking-widest text-foreground">Strategy Overview</h4>
              </div>
-             <div className="p-5 rounded-2xl border border-border/50 bg-red-500/5 space-y-3">
-               <h4 className="text-xs font-bold text-red-600 uppercase flex items-center gap-2">
-                 <ArrowRight className="w-3.5 h-3.5" />
-                 Minimize
-               </h4>
-               <ul className="space-y-1.5">
-                 {plan.guidelines.toAvoid.map((item, i) => (
-                   <li key={i} className="text-[11px] text-muted-foreground flex items-center gap-2">
-                     <div className="w-1 h-1 rounded-full bg-red-500/40" />
-                     {item}
-                   </li>
-                 ))}
-               </ul>
-             </div>
-             <div className="p-5 rounded-2xl border border-border/50 bg-primary/5 space-y-3">
-               <h4 className="text-xs font-bold text-primary uppercase flex items-center gap-2">
-                 <HelpCircle className="w-3.5 h-3.5" />
-                 Pro Tips
-               </h4>
-               <ul className="space-y-1.5">
-                 {plan.guidelines.tips.map((item, i) => (
-                   <li key={i} className="text-[11px] text-muted-foreground flex items-center gap-2">
-                     <div className="w-1 h-1 rounded-full bg-primary/40" />
-                     {item}
-                   </li>
-                 ))}
-               </ul>
-             </div>
+             <p className="text-sm text-muted-foreground leading-relaxed">
+               This plan is optimized based on your body composition and goals. Follow the 7-day rotation strictly for the first phase. Ensure you stay hydrated and prioritize sleep for optimal recovery.
+             </p>
           </div>
 
           <button
