@@ -173,19 +173,32 @@ export default function CompleteOnboardingPage() {
                 </label>
                 <div className="grid grid-cols-2 gap-4">
                   {[
-                    { id: "NUTRITION", label: "Nutrition AI", icon: Zap, color: "from-orange-500/20 to-red-500/20" },
-                    { id: "BEAUTY", label: "Beauty AI", icon: Sparkles, color: "from-pink-500/20 to-purple-500/20" },
+                    { id: "NUTRITION", label: "Nutrition AI", icon: Zap, color: "from-orange-500/20 to-red-500/20", locked: false },
+                    { id: "BEAUTY", label: "Beauty AI", icon: Sparkles, color: "from-pink-500/20 to-purple-500/20", locked: true },
                   ].map((mode) => (
                     <button
                       key={mode.id}
-                      onClick={() => updateFormData({ preferredMode: mode.id as any })}
+                      type="button"
+                      disabled={mode.locked}
+                      onClick={() => {
+                        if (!mode.locked) {
+                          updateFormData({ preferredMode: mode.id as any });
+                        }
+                      }}
                       className={cn(
-                        "flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all duration-200 text-center",
-                        formData.preferredMode === mode.id
+                        "relative flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all duration-200 text-center",
+                        mode.locked
+                          ? "border-border/40 bg-muted/20 text-muted-foreground cursor-not-allowed opacity-70"
+                          : formData.preferredMode === mode.id
                           ? cn("border-primary bg-linear-to-br", mode.color)
                           : "border-border/40 hover:border-primary/20 hover:bg-muted/30"
                       )}
                     >
+                      {mode.locked && (
+                        <span className="absolute top-3 right-3 rounded-full bg-background/90 border border-border/60 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide">
+                          Coming Soon
+                        </span>
+                      )}
                       <mode.icon className="w-8 h-8" />
                       <span className="text-sm font-bold">{mode.label}</span>
                     </button>
